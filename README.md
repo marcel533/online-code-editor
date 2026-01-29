@@ -18,3 +18,4 @@ Kein aufgeblasenes Tool, keine Lernkurve, kein Marketing-Gelaber.
 Einfach öffnen, tippen, sehen was passiert.
 
 Dieser Editor ist für Leute, die verstehen, was sie tun – oder es schnell herausfinden wollen.
+URL:https://marcel533.github.io/online-code-editor/
