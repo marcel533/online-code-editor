@@ -1,274 +1,1610 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeStudio Ultimate - Pro</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <style>
-        :root {
-            --bg: #0f0f0f; --sidebar-bg: #181818; --editor-bg: #1e1e1e;
-            --accent: #007acc; --text: #cccccc; --border: #333; --header-bg: #252526;
-            --danger: #f44336; --success: #28a745;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--header-bg); border-bottom: 1px solid var(--border); }
-        .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
-        .btn:hover { opacity: 0.8; }
-        .btn-download { background: var(--success); margin-left: 10px; }
-
-        .main { display: flex; flex-grow: 1; overflow: hidden; }
-
-        /* Sidebar & Scanner */
-        .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 12px; font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-        .file-list { flex-grow: 1; overflow-y: auto; }
-        .file-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #252525; font-size: 14px; }
-        .file-item.active { background: #37373d; border-left: 4px solid var(--accent); }
-
-        #security-panel { padding: 12px; background: #1e1e1e; border-top: 1px solid var(--border); font-size: 12px; }
-        .status-good { color: var(--success); }
-        .status-warn { color: #ffeb3b; }
-        .status-danger { color: var(--danger); }
-
-        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--editor-bg); }
-        textarea { flex-grow: 1; background: transparent; color: #dcdcdc; border: none; padding: 20px; font-family: 'Consolas', monospace; font-size: 14px; outline: none; resize: none; line-height: 1.5; }
-        
-        .preview-container { width: 40%; background: white; border-left: 1px solid var(--border); }
-        iframe { width: 100%; height: 100%; border: none; }
-
-        /* Captcha Overlay */
-        #captcha-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); display: flex; justify-content: center;
-            align-items: center; z-index: 9999;
-        }
-        .captcha-box { background: #252526; padding: 40px; border-radius: 12px; text-align: center; border: 1px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #captcha-input { background: #1e1e1e; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 4px; width: 100px; text-align: center; font-size: 18px; margin: 15px 0; }
-    .file-item { 
-    padding: 10px 15px; 
-    cursor: pointer; 
-    border-bottom: 1px solid #252525; 
-    font-size: 14px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="referrer" content="no-referrer">
+<title>CodeStudio Pro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237AA2D6' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16'/%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root {
+  --bg: #0F0F11;
+  --surface: #161618;
+  --raised: #1D1D20;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #E4E4E7;
+  --muted: #A0A0A8;
+  --faint: #7B7B84;
+  --accent: #7AA2D6;
+  --high: #E5484D;
+  --med: #E0A23B;
+  --low: #9A9AA2;
+  --ok: #4FB477;
+  --r: 8px;
+  --r-sm: 6px;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  color-scheme: dark;
 }
-.file-item:hover { background: #2a2d2e; }
-.file-item.active { background: #37373d; border-left: 4px solid var(--accent); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 var(--sans); overflow: hidden;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: rgba(122, 162, 214, 0.3); }
+* { scrollbar-width: thin; scrollbar-color: #3a3a40 transparent; }
+.muted { color: var(--muted); }
 
-.delete-btn { 
-    color: #888; 
-    font-weight: bold; 
-    padding: 2px 8px; 
-    border-radius: 4px; 
-    transition: 0.2s;
+#shell { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+/* Header */
+#topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  height: 48px; padding: 0 12px; flex: none;
+  background: var(--surface); border-bottom: 1px solid var(--border);
 }
-.delete-btn:hover { 
-    background: var(--danger); 
-    color: white; 
+#topbar .left, #topbar .right { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.brand { font-weight: 600; font-size: 14px; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.brand svg { color: var(--accent); flex: none; }
+.brand .pro { color: var(--muted); font-weight: 500; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  background: var(--raised); border: 1px solid var(--border-strong); color: var(--text);
+  padding: 6px 12px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500;
 }
-    
-    </style>
+.btn:hover { border-color: rgba(255,255,255,0.28); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #0F0F11; font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { background: var(--high); border-color: var(--high); color: #0F0F11; font-weight: 600; }
+.btn.ghost { background: transparent; border-color: var(--border); }
+.btn kbd {
+  font: 11px var(--mono); color: var(--muted); background: var(--bg);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
+}
+.icon-btn {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none;
+  background: transparent; border: 1px solid transparent; border-radius: var(--r-sm);
+  color: var(--muted); font-size: 16px; line-height: 1; padding: 0;
+}
+.icon-btn:hover { background: var(--raised); color: var(--text); }
+
+.seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r-sm); overflow: hidden; flex: none; }
+.seg button {
+  background: transparent; border: 0; color: var(--muted); padding: 4px 10px; font-size: 12px; font-weight: 500;
+}
+.seg button + button { border-left: 1px solid var(--border-strong); }
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+.seg button:hover { color: var(--text); }
+.mobile-tabs, .menu-btn { display: none; }
+
+/* Layout */
+.app { flex: 1; min-height: 0; display: grid; grid-template-columns: 232px minmax(0, 1fr); }
+.sidebar {
+  display: flex; flex-direction: column; min-height: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+}
+.side-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 8px 8px 14px; font-size: 12px; font-weight: 600; color: var(--muted);
+  border-bottom: 1px solid var(--border); height: 36px;
+}
+.file-list { list-style: none; margin: 0; padding: 6px 0; flex: 1; overflow-y: auto; }
+.file { display: flex; align-items: center; margin: 0 6px 1px; border-radius: var(--r-sm); }
+.file:hover { background: var(--raised); }
+.file.active { background: var(--raised); box-shadow: inset 2px 0 0 var(--accent); }
+.file-open {
+  flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 7px 8px 7px 10px;
+  font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: var(--r-sm);
+}
+.file-del { opacity: 0; width: 24px; height: 24px; margin-right: 2px; }
+.file:hover .file-del, .file:focus-within .file-del { opacity: 1; }
+.file-del:hover { background: var(--high); color: #0F0F11; }
+@media (hover: none) { .file-del { opacity: 1; } }
+
+.sec-card {
+  text-align: left; margin: 8px; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: var(--r); background: var(--bg); display: grid; gap: 2px;
+}
+.sec-card:hover { border-color: var(--border-strong); }
+.sec-title { font-size: 12px; font-weight: 600; color: var(--muted); }
+.sec-status { font-size: 13px; font-weight: 600; }
+.sec-status.ok { color: var(--ok); }
+.sec-status.warn { color: var(--med); }
+.sec-status.bad { color: var(--high); }
+.sec-detail { font-size: 12px; color: var(--muted); }
+
+.work { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.split {
+  flex: 1; min-height: 0; display: grid;
+  grid-template-columns: var(--split, 50%) 6px minmax(0, 1fr);
+}
+.pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.pane-bar {
+  display: flex; align-items: center; gap: 10px; height: 36px; flex: none; padding: 0 10px 0 14px;
+  background: var(--surface); border-bottom: 1px solid var(--border); font-size: 12px; overflow-x: auto; white-space: nowrap;
+}
+.pane-bar .fname { font-weight: 600; color: var(--text); }
+.pane-bar .grow { flex: 1; }
+.check { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); cursor: pointer; }
+.check input { accent-color: var(--accent); margin: 0; }
+
+.handle { position: relative; cursor: col-resize; background: transparent; touch-action: none; }
+.handle::after { content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 1px; background: var(--border-strong); }
+.handle:hover::after, .handle:focus-visible::after { left: 1px; width: 3px; background: var(--accent); }
+body.dragging { user-select: none; cursor: col-resize; }
+body.dragging.dragging-y { cursor: row-resize; }
+body.dragging iframe { pointer-events: none; }
+
+/* Editor */
+.editor-scroll { flex: 1; min-height: 0; overflow: auto; display: flex; background: var(--bg); }
+.gutter {
+  position: sticky; left: 0; z-index: 2; flex: none; min-width: 52px; padding: 12px 12px 80px 8px;
+  background: var(--bg); border-right: 1px solid var(--border);
+  font: 13px/20px var(--mono); color: var(--faint); text-align: right; user-select: none; cursor: text;
+}
+.gutter .ln { height: 20px; }
+.gutter .m-high { color: var(--high); font-weight: 700; }
+.gutter .m-med { color: var(--med); font-weight: 700; }
+.gutter .m-low { color: var(--low); font-weight: 700; }
+.code-box { position: relative; flex: 1 0 auto; min-width: 0; }
+.code-box pre, .code-box textarea {
+  margin: 0; padding: 12px 16px 80px; border: 0; border-radius: 0;
+  font: 13px/20px var(--mono); letter-spacing: 0; word-spacing: 0; tab-size: 2; -moz-tab-size: 2;
+  font-variant-ligatures: none; font-kerning: none;
+  white-space: pre; overflow-wrap: normal; word-break: normal;
+}
+.code-box pre { color: var(--text); min-height: 100%; pointer-events: none; }
+.code-box textarea {
+  position: absolute; inset: 0; width: 100%; height: 100%; resize: none; overflow: hidden;
+  background: transparent; color: transparent; caret-color: var(--text); outline: none;
+}
+.code-box textarea::selection { background: rgba(122, 162, 214, 0.3); color: transparent; }
+.tk-c { color: #70707A; font-style: italic; }
+.tk-s { color: #A3C28B; }
+.tk-n { color: #D4A574; }
+.tk-k { color: #7AA2D6; }
+.tk-f { color: #F0F0F2; }
+.tk-t { color: #7AA2D6; }
+.tk-a { color: #C9B8A0; }
+.tk-p { color: #8A8A93; }
+.tk-q { color: #9DB4D4; }
+
+/* Preview */
+.stage { flex: 1; min-height: 0; padding: 10px; background: #0B0B0D; overflow: auto; }
+.frame { margin: 0 auto; width: 100%; max-width: 100%; height: 100%; background: #fff; border-radius: var(--r-sm); overflow: hidden; }
+.frame iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+
+/* Dock */
+.dock { position: relative; flex: none; display: flex; flex-direction: column; background: var(--surface); border-top: 1px solid var(--border); overflow: hidden; }
+.grip { position: absolute; top: -3px; left: 0; right: 0; height: 7px; cursor: row-resize; z-index: 3; touch-action: none; }
+.dock-tabs { display: flex; align-items: center; gap: 4px; height: 34px; flex: none; padding: 0 8px; border-bottom: 1px solid var(--border); }
+.dock-tab {
+  display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; color: var(--muted);
+  padding: 5px 10px; border-radius: var(--r-sm); font-size: 12px; font-weight: 600;
+}
+.dock-tab:hover { color: var(--text); }
+.dock-tab[aria-selected="true"] { color: var(--text); background: var(--raised); }
+.count { font-size: 11px; font-weight: 600; min-width: 18px; text-align: center; padding: 0 5px; border-radius: 9px; background: var(--border-strong); color: var(--text); }
+.count.bad { background: var(--high); color: #0F0F11; }
+.count.warn { background: var(--med); color: #0F0F11; }
+.spacer { flex: 1; }
+.link-btn { background: none; border: 0; color: var(--muted); font-size: 12px; padding: 4px 8px; border-radius: var(--r-sm); }
+.link-btn:hover { color: var(--text); background: var(--raised); }
+#dockToggle svg { transition: none; }
+.dock.collapsed #dockToggle svg { transform: rotate(180deg); }
+.dock-body { flex: 1; min-height: 0; overflow: auto; font: 12px/1.5 var(--mono); }
+.empty { padding: 16px 14px; color: var(--muted); font: 13px/1.5 var(--sans); max-width: 70ch; }
+.con-row { padding: 3px 14px; border-bottom: 1px solid var(--border); white-space: pre-wrap; word-break: break-word; }
+.con-row.warn { color: var(--med); }
+.con-row.error { color: var(--high); }
+.con-row.debug, .con-row.info { color: var(--muted); }
+
+.findings { list-style: none; margin: 0; padding: 0; font-family: var(--sans); }
+.finding {
+  display: grid; grid-template-columns: 64px 1fr auto; align-items: start; gap: 12px; width: 100%; text-align: left;
+  background: none; border: 0; border-bottom: 1px solid var(--border); padding: 8px 14px; font-size: 13px;
+}
+.finding:hover { background: var(--raised); }
+.sev { display: inline-block; text-align: center; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid currentColor; }
+.sev.high { color: var(--high); } .sev.med { color: var(--med); } .sev.low { color: var(--low); }
+.f-fix { color: var(--muted); font-size: 12px; }
+.f-loc { font: 12px var(--mono); color: var(--accent); white-space: nowrap; }
+.sec-note { padding: 8px 14px; color: var(--faint); font: 12px var(--sans); }
+
+/* Status bar */
+.status {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none;
+  height: 24px; padding: 0 12px; background: var(--surface); border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--muted);
+}
+.status .grp { display: flex; gap: 16px; }
+
+/* Overlays and dialogs */
+.overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: rgba(15, 15, 17, 0.97); padding: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r); }
+.captcha-card { position: relative; width: min(360px, 100%); padding: 28px 24px 24px; text-align: center; display: grid; gap: 12px; }
+.captcha-card h2 { margin: 0; font-size: 18px; }
+.captcha-card.alert { background: #2a1214; border-color: var(--high); box-shadow: 0 0 0 1px var(--high), 0 0 40px rgba(229, 72, 77, 0.35); }
+.captcha-card.alert h2 { color: var(--high); }
+.captcha-card p { margin: 0; color: var(--muted); }
+.captcha-card .lang { position: absolute; top: 10px; right: 10px; }
+.cap-q { font: 600 28px var(--mono); padding: 6px 0; }
+.captcha-card input {
+  width: 120px; justify-self: center; text-align: center; font: 600 18px var(--mono); padding: 8px;
+  background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--r-sm);
+}
+.captcha-card input::-webkit-outer-spin-button, .captcha-card input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.captcha-card input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.err { color: var(--high); font-size: 13px; margin: 0; }
+
+dialog { color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r); padding: 20px; width: min(420px, calc(100vw - 32px)); }
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+dialog h2 { margin: 0 0 8px; font-size: 16px; }
+dialog p { margin: 0 0 12px; }
+dialog label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+dialog input[type=text] { background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--r-sm); padding: 8px 10px; color: var(--text); }
+.dlg-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+dialog.pal { width: min(560px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0; overflow: hidden; }
+.pal input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--border); padding: 14px 16px; font-size: 15px; color: var(--text); outline: none; }
+.pal ul { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow: auto; }
+.pal li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: var(--r-sm); cursor: pointer; font-size: 13px; }
+.pal li[aria-selected="true"] { background: var(--raised); box-shadow: inset 2px 0 0 var(--accent); }
+.pal li span:last-child { color: var(--faint); font: 11px var(--mono); }
+.pal .none { padding: 12px 10px; color: var(--muted); cursor: default; }
+
+#toasts { position: fixed; right: 12px; bottom: 36px; z-index: 200; display: grid; gap: 8px; justify-items: end; }
+.toast { background: var(--raised); border: 1px solid var(--border-strong); border-radius: var(--r-sm); padding: 8px 12px; font-size: 13px; max-width: min(360px, 90vw); }
+.toast.warn { border-color: var(--med); }
+
+/* Legal dialog */
+dialog.legal { width: min(660px, calc(100vw - 32px)); padding: 0; }
+#legalInner { padding: 20px; display: grid; gap: 12px; }
+#legalInner h2 { margin: 0; }
+.legal-body { max-height: min(60vh, 520px); overflow: auto; padding-right: 8px; font-size: 13px; line-height: 1.55; color: var(--muted); }
+.legal-body h3 { margin: 16px 0 4px; font-size: 13px; color: var(--text); }
+.legal-body h3:first-child { margin-top: 0; }
+.legal-body p { margin: 0 0 8px; }
+.legal-body a { color: var(--accent); }
+.legal-body a.discord-btn, .discord-btn {
+  display: inline-flex; align-items: center; gap: 10px; margin: 2px 0 6px; padding: 9px 16px;
+  background: #5865F2; border: 1px solid #5865F2; border-radius: var(--r-sm);
+  color: #fff; font: 600 14px var(--sans); text-decoration: none; cursor: pointer;
+}
+.discord-btn:hover { background: #4752C4; border-color: #4752C4; }
+.discord-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.discord-btn svg { width: 20px; height: 20px; flex: none; fill: currentColor; }
+.legal-meta { color: var(--faint); font-size: 12px; margin-bottom: 12px; }
+.cap-legal { display: flex; justify-content: center; gap: 4px; }
+.status .grp { white-space: nowrap; align-items: center; }
+.status .link-btn { padding: 0 6px; font-size: 12px; line-height: 20px; }
+
+/* Small screens */
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { position: fixed; z-index: 50; top: 48px; bottom: 24px; left: 0; width: 248px; display: none; }
+  .sidebar.open { display: flex; }
+  .menu-btn, .mobile-tabs { display: inline-flex; }
+  #importBtn, #paletteBtn kbd, .brand .pro { display: none; }
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .handle { display: none; }
+  .work[data-view="editor"] .preview-pane { display: none; }
+  .work[data-view="preview"] .editor-pane { display: none; }
+  #deviceSeg, #frameW { display: none; }
+}
+@media (max-width: 520px) {
+  .brand strong { display: none; }
+  #stLang, #stSize, #stSave, [data-i18n="st.by"] { display: none; }
+  .status { justify-content: space-between; }
+  #paletteBtn { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
 </head>
 <body>
 
-<div id="captcha-overlay">
-    <div class="captcha-box">
-        <h2 style="color: white; margin-top: 0;">🤖 Bot-Schutz</h2>
-        <p>Bitte löse die Aufgabe:</p>
-        <h1 id="captcha-question" style="color: var(--accent); margin: 10px 0;"></h1>
-        <input type="number" id="captcha-input" placeholder="?">
-        <button class="btn" onclick="verifyCaptcha()" style="display: block; width: 100%;">Bestätigen</button>
-        <p id="captcha-error" style="color: var(--danger); font-size: 13px; margin-top: 15px; display: none;">❌ Falsch! Versuche es erneut.</p>
+<noscript><p style="padding:24px">CodeStudio Pro needs JavaScript.</p></noscript>
+
+<div id="captcha" class="overlay" role="dialog" aria-modal="true" aria-labelledby="cap-title" hidden>
+  <div class="card captcha-card">
+    <div class="seg lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en">EN</button><button type="button" data-lang="de">DE</button>
     </div>
+    <h2 id="cap-title" data-i18n="cap.title"></h2>
+    <p data-i18n="cap.prompt"></p>
+    <div id="cap-q" class="cap-q"></div>
+    <input id="cap-in" type="number" inputmode="numeric" autocomplete="off" aria-labelledby="cap-q">
+    <button type="button" class="btn primary" id="cap-ok" style="justify-content:center" data-i18n="cap.ok"></button>
+    <p id="cap-err" class="err" role="alert" hidden data-i18n="cap.wrong"></p>
+    <div class="cap-legal">
+      <button type="button" class="link-btn" data-legal="tos" data-i18n="legal.tos"></button>
+      <button type="button" class="link-btn" data-legal="imprint" data-i18n="legal.imprint"></button>
+    </div>
+  </div>
 </div>
 
-<header>
-    <div style="display: flex; align-items: center; gap: 12px;">
-    <img src="https://i.pinimg.com/736x/ea/b3/4b/eab34b728f992348049cae4bbdce8fda.jpg" alt="Logo" style="height: 90px; width: auto;">
-    <strong style="color: white; letter-spacing: 1px;">
-        CODESTUDIO <span style="color:var(--accent)">PRO</span>
-    </strong>
-</div>
-    <button class="btn btn-download" onclick="downloadAll()">📦 Export mit Wasserzeichen (.ZIP)</button>
-</header>
+<div id="shell" inert>
+  <header id="topbar">
+    <div class="left">
+      <button type="button" class="icon-btn menu-btn" id="menuBtn" data-i18n-label="nav.explorer">&#9776;</button>
+      <div class="brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
+        <strong>CodeStudio <span class="pro">Pro</span></strong>
+      </div>
+    </div>
+    <div class="mobile-tabs seg" id="viewSeg" role="group">
+      <button type="button" data-view="editor" aria-pressed="true" data-i18n="nav.code"></button>
+      <button type="button" data-view="preview" aria-pressed="false" data-i18n="nav.preview"></button>
+    </div>
+    <div class="right">
+      <button type="button" class="btn ghost" id="importBtn" data-i18n="nav.import"></button>
+      <button type="button" class="btn" id="exportBtn" data-i18n="nav.export"></button>
+      <button type="button" class="btn ghost" id="paletteBtn"><span data-i18n="nav.commands"></span><kbd>Ctrl K</kbd></button>
+      <div class="seg lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button><button type="button" data-lang="de">DE</button>
+      </div>
+    </div>
+  </header>
 
-<div class="main">
-    <div class="sidebar">
-        <div class="sidebar-header">Explorer <span onclick="addNewFile()" style="cursor:pointer; color:var(--accent)">+</span></div>
-        <div id="file-list" class="file-list"></div>
-        <div id="security-panel">
-            <strong>Security Scan:</strong>
-            <div id="scan-result" class="status-good">✓ Sicher</div>
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-head">
+        <span data-i18n="nav.explorer"></span>
+        <button type="button" class="icon-btn" id="newFileBtn" data-i18n-label="nav.newFile">+</button>
+      </div>
+      <ul class="file-list" id="fileList"></ul>
+      <button type="button" class="sec-card" id="secCard">
+        <span class="sec-title" data-i18n="sec.title"></span>
+        <span class="sec-status ok" id="secStatus"></span>
+        <span class="sec-detail" id="secDetail"></span>
+      </button>
+    </aside>
+
+    <section class="work" id="work" data-view="editor">
+      <div class="split" id="split">
+        <div class="pane editor-pane">
+          <div class="pane-bar"><span class="fname" id="curName"></span></div>
+          <div class="editor-scroll" id="edScroll">
+            <div class="gutter" id="gutter" aria-hidden="true"></div>
+            <div class="code-box">
+              <pre id="hl" aria-hidden="true"></pre>
+              <textarea id="codeEditor" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" wrap="off" aria-label="Code editor"></textarea>
+            </div>
+          </div>
         </div>
+        <div class="handle" id="handle" role="separator" aria-orientation="vertical" tabindex="0" data-i18n-label="nav.resize"></div>
+        <div class="pane preview-pane">
+          <div class="pane-bar">
+            <span class="fname" data-i18n="prev.title"></span>
+            <span class="muted" id="frameW"></span>
+            <span class="grow"></span>
+            <div class="seg" id="deviceSeg" role="group">
+              <button type="button" data-w="full" aria-pressed="true" data-i18n="dev.full"></button>
+              <button type="button" data-w="768" aria-pressed="false" data-i18n="dev.tablet"></button>
+              <button type="button" data-w="390" aria-pressed="false" data-i18n="dev.mobile"></button>
+            </div>
+            <label class="check" data-i18n-title="prev.lockHint"><input type="checkbox" id="lockNet"><span data-i18n="prev.lock"></span></label>
+            <button type="button" class="icon-btn" id="reloadBtn" data-i18n-label="prev.reload">&#8635;</button>
+          </div>
+          <div class="stage" id="stage">
+            <div class="frame" id="frame">
+              <iframe id="preview" title="Preview" sandbox="allow-scripts allow-modals allow-forms" referrerpolicy="no-referrer"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dock" id="dock">
+        <div class="grip" id="grip"></div>
+        <div class="dock-tabs" role="tablist">
+          <button type="button" class="dock-tab" role="tab" id="tabConsole" aria-selected="true"><span data-i18n="dock.console"></span><span class="count" id="conCount" hidden></span></button>
+          <button type="button" class="dock-tab" role="tab" id="tabSec" aria-selected="false"><span data-i18n="dock.security"></span><span class="count" id="secCount" hidden></span></button>
+          <span class="spacer"></span>
+          <button type="button" class="link-btn" id="clearCon" data-i18n="dock.clear"></button>
+          <button type="button" class="icon-btn" id="dockToggle" data-i18n-label="dock.toggle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        </div>
+        <div class="dock-body" id="dockCon" role="tabpanel" aria-live="off"></div>
+        <div class="dock-body" id="dockSec" role="tabpanel" hidden></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="status">
+    <div class="grp"><span id="stPos"></span><span id="stLang"></span><span id="stSize"></span></div>
+    <div class="grp">
+      <button type="button" class="link-btn" data-legal="tos" data-i18n="legal.tos"></button>
+      <button type="button" class="link-btn" data-legal="imprint" data-i18n="legal.imprint"></button>
+      <span id="stSave"></span><span data-i18n="st.by"></span>
     </div>
-    <div class="editor-container">
-        <textarea id="codeEditor" spellcheck="false" placeholder="Hier tippen..."></textarea>
-    </div>
-    <div class="preview-container">
-        <iframe id="preview"></iframe>
-    </div>
+  </footer>
 </div>
+
+<dialog id="dlg">
+  <div id="dlgForm">
+    <h2 id="dlgTitle"></h2>
+    <p id="dlgMsg" class="muted" hidden></p>
+    <label id="dlgLabelWrap" hidden><span id="dlgLabel"></span><input id="dlgInput" type="text" maxlength="63" autocomplete="off" spellcheck="false"></label>
+    <p id="dlgErr" class="err" role="alert" hidden></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="dlgCancel"></button>
+      <button type="button" class="btn primary" id="dlgOk"></button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="legal" class="legal" aria-labelledby="legalTitle">
+  <div id="legalInner">
+    <h2 id="legalTitle"></h2>
+    <div id="legalBody" class="legal-body" tabindex="0"></div>
+    <div class="dlg-actions"><button type="button" class="btn primary" id="legalClose" data-i18n="legal.close"></button></div>
+  </div>
+</dialog>
+
+<dialog id="pal" class="pal" aria-label="Commands">
+  <input id="palIn" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palList" data-i18n-ph="pal.placeholder">
+  <ul id="palList" role="listbox"></ul>
+</dialog>
+
+<input type="file" id="fileInput" multiple accept=".html,.htm,.css,.js,.mjs,.json,.txt,.md,.svg,.zip" hidden>
+<div id="toasts" role="status" aria-live="polite"></div>
 
 <script>
-    let files = {
-        "index.html": "<h1>Willkommen</h1>\n<p>Captcha gelöst!</p>",
-        "style.css": "body { background: #f4f4f4; text-align: center; font-family: sans-serif; }",
-        "script.js": "console.log('Online Editor aktiv');"
-    };
-    let currentFile = "index.html";
-    let captchaAnswer = 0;
+(() => {
+'use strict';
 
-    // --- CAPTCHA FIX ---
-    function initCaptcha() {
-        const n1 = Math.floor(Math.random() * 10) + 1;
-        const n2 = Math.floor(Math.random() * 10) + 1;
-        captchaAnswer = n1 + n2;
-        document.getElementById('captcha-question').innerText = `${n1} + ${n2} = ?`;
-    }
+/* ---------- Constants ---------- */
+const SITE_URL = 'https://marcel533.github.io/online-code-editor/';
+const CONTACT_MAIL = 'marcel.worgotter@proton.me';
+const DISCORD_URL = 'https://discord.gg/5RqSyuZbDq';
+const STORE_KEY = 'codestudio.pro.v2';
+const LANG_KEY = 'codestudio.lang';
+const HUMAN_KEY = 'codestudio.human';
+const MAX_FILES = 40;
+const MAX_BYTES = 1000000;
+const NAME_RE = /^[A-Za-z0-9][A-Za-z0-9._ -]{0,62}$/;
+const TEXT_EXT = ['html', 'htm', 'css', 'js', 'mjs', 'json', 'txt', 'md', 'svg'];
 
-    function verifyCaptcha() {
-        const val = parseInt(document.getElementById('captcha-input').value);
-        if (val === captchaAnswer) {
-            document.getElementById('captcha-overlay').style.display = 'none';
-        } else {
-            document.getElementById('captcha-error').style.display = 'block';
-            document.getElementById('captcha-input').value = "";
-            initCaptcha();
-        }
-    }
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const extOf = n => (n.includes('.') ? n.split('.').pop().toLowerCase() : '');
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch { return false; } };
+const ssGet = k => { try { return sessionStorage.getItem(k); } catch { return null; } };
+const ssSet = (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* ignore */ } };
 
-    // --- SECURITY SCANNER ---
-    function scanCode(code) {
-        const display = document.getElementById('scan-result');
-        if (/eval\(|innerHTML|document\.write/g.test(code)) {
-            display.innerText = "⚠ Risiko erkannt";
-            display.className = "status-warn";
-        } else {
-            display.innerText = "✓ Sicher";
-            display.className = "status-good";
-        }
-    }
+/* ---------- Motion (GSAP is optional; the app works without it) ---------- */
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const motionOK = () => typeof window.gsap !== 'undefined' && !reduceMotion.matches;
 
-    // --- DOWNLOAD MIT WASSERZEICHEN FIX ---
-    async function downloadAll() {
-        const zip = new JSZip();
-        const siteUrl = "https://marcel533.github.io/online-code-editor/";
-        const markText = `\n\n/* ERSTELLT MIT: ${siteUrl} */`;
-        const markHtml = `\n\n`;
+/* ---------- i18n ---------- */
+const I18N = {
+  en: {
+    'nav.explorer': 'Files', 'nav.newFile': 'New file', 'nav.import': 'Import', 'nav.export': 'Export ZIP',
+    'nav.commands': 'Commands', 'nav.code': 'Code', 'nav.preview': 'Preview', 'nav.resize': 'Resize panels',
+    'file.rename': 'Rename', 'file.delete': 'Delete',
+    'sec.title': 'Security scan', 'sec.safe': 'No issues found', 'sec.risk': 'Issues found',
+    'sec.detail': '{n} findings, score {s}/100', 'sec.high': 'High', 'sec.med': 'Medium', 'sec.low': 'Low',
+    'sec.empty': 'All {n} files passed {r} checks.',
+    'sec.note': 'Pattern-based scan. It catches common mistakes, not every vulnerability.',
+    'dock.console': 'Console', 'dock.security': 'Security', 'dock.clear': 'Clear', 'dock.toggle': 'Collapse or expand panel',
+    'con.empty': 'No output yet. console.log() calls and errors from your page show up here.',
+    'prev.title': 'Preview', 'prev.lock': 'Block network', 'prev.reload': 'Reload preview',
+    'prev.lockHint': 'Adds a Content-Security-Policy so the previewed page cannot contact other sites.',
+    'prev.none': 'No HTML file to preview.',
+    'dev.full': 'Full', 'dev.tablet': 'Tablet', 'dev.mobile': 'Mobile',
+    'dlg.cancel': 'Cancel', 'dlg.ok': 'OK', 'dlg.newTitle': 'New file', 'dlg.nameLabel': 'File name',
+    'dlg.renameTitle': 'Rename file', 'dlg.deleteTitle': 'Delete file',
+    'dlg.deleteMsg': 'Delete "{name}"? This cannot be undone.',
+    'dlg.resetTitle': 'Reset project', 'dlg.resetMsg': 'Replace all files with the starter project?', 'dlg.reset': 'Reset',
+    'err.last': 'At least one file must remain.', 'err.exists': 'A file with this name already exists.',
+    'err.name': 'Use letters, numbers, dot, dash, underscore or space (max. 63 characters).',
+    'err.max': 'Limit of {n} files reached.',
+    'toast.exported': 'ZIP exported', 'toast.imported': 'Imported {n} files, skipped {m}.',
+    'toast.reset': 'Project reset', 'toast.saved': 'Saved', 'toast.downloaded': 'File downloaded',
+    'toast.zipMissing': 'ZIP library not loaded. Check your connection.',
+    'st.pos': 'Ln {l}, Col {c}', 'st.saved': 'Saved', 'st.saving': 'Saving...', 'st.error': 'Not saved (storage blocked)',
+    'st.by': 'by marcel533', 'st.temp': 'Resets on reload',
+    'legal.tos': 'Terms of Service', 'legal.imprint': 'Legal Notice', 'legal.close': 'Close',
+    'legal.discord': 'Join our Discord', 'legal.blocked': 'Your browser blocked the pop-up. Copy this link and open it manually:',
+    'pal.placeholder': 'Type a command...', 'pal.none': 'No matching command',
+    'cmd.new': 'New file', 'cmd.rename': 'Rename current file', 'cmd.delete': 'Delete current file',
+    'cmd.run': 'Reload preview', 'cmd.import': 'Import files or ZIP', 'cmd.export': 'Export project as ZIP',
+    'cmd.download': 'Download current file', 'cmd.console': 'Show console', 'cmd.security': 'Show security report',
+    'cmd.lock': 'Toggle network block in preview', 'cmd.full': 'Preview: full width', 'cmd.tablet': 'Preview: tablet width',
+    'cmd.mobile': 'Preview: mobile width', 'cmd.lang': 'Switch language', 'cmd.reset': 'Reset project',
+    'cap.title': 'Bot check', 'cap.prompt': 'Solve this to continue.', 'cap.ok': 'Continue', 'cap.wrong': 'Wrong answer. Here is a new one.', 'cap.last': 'Wrong again. One more mistake and you will be removed from this page.',
+    'r.eval': 'eval() runs a string as code', 'r.eval.fix': 'Parse data with JSON.parse, or call a real function.',
+    'r.func': 'new Function() compiles a string to code', 'r.func.fix': 'Pass a function instead of building code from strings.',
+    'r.timer': 'setTimeout/setInterval with a string behaves like eval', 'r.timer.fix': 'Pass a function.',
+    'r.inner': 'Assigning to innerHTML/outerHTML can inject scripts (XSS)', 'r.inner.fix': 'Use textContent, or sanitize the markup first.',
+    'r.adjacent': 'insertAdjacentHTML inserts raw HTML', 'r.adjacent.fix': 'Build nodes with createElement and textContent.',
+    'r.write': 'document.write inserts raw HTML', 'r.write.fix': 'Build nodes with createElement and textContent.',
+    'r.inline': 'Inline event handler (onclick="...")', 'r.inline.fix': 'Use addEventListener. It also works under a strict CSP.',
+    'r.jsurl': 'javascript: URL runs code on click', 'r.jsurl.fix': 'Use a button with an event listener.',
+    'r.blank': 'target="_blank" without rel="noopener"', 'r.blank.fix': 'Add rel="noopener noreferrer".',
+    'r.http': 'Resource loaded over http://', 'r.http.fix': 'Use https://. Browsers block or warn on mixed content.',
+    'r.sri': 'External script without an integrity attribute', 'r.sri.fix': 'Add integrity and crossorigin, or host the file yourself.',
+    'r.secret': 'Possible hardcoded secret', 'r.secret.fix': 'Remove it and rotate the key. Anything in client code is public.',
+    'r.storage': 'Token or password stored in web storage', 'r.storage.fix': 'Prefer httpOnly cookies. Any script on the page can read web storage.',
+    'r.postmsg': 'postMessage with target origin "*"', 'r.postmsg.fix': 'Pass the exact origin and check event.origin when receiving.',
+    'r.iframe': '<iframe> without sandbox', 'r.iframe.fix': 'Add sandbox and only the permissions you need.',
+    'r.random': 'Math.random() is not secure for tokens', 'r.random.fix': 'Use crypto.getRandomValues().'
+  },
+  de: {
+    'nav.explorer': 'Dateien', 'nav.newFile': 'Neue Datei', 'nav.import': 'Importieren', 'nav.export': 'Export (.ZIP)',
+    'nav.commands': 'Befehle', 'nav.code': 'Code', 'nav.preview': 'Vorschau', 'nav.resize': 'Bereiche anpassen',
+    'file.rename': 'Umbenennen', 'file.delete': 'Löschen',
+    'sec.title': 'Sicherheits-Scan', 'sec.safe': 'Keine Probleme gefunden', 'sec.risk': 'Risiken erkannt',
+    'sec.detail': '{n} Funde, Score {s}/100', 'sec.high': 'Hoch', 'sec.med': 'Mittel', 'sec.low': 'Niedrig',
+    'sec.empty': 'Alle {n} Dateien haben {r} Prüfungen bestanden.',
+    'sec.note': 'Mustersuche. Sie findet häufige Fehler, nicht jede Schwachstelle.',
+    'dock.console': 'Konsole', 'dock.security': 'Sicherheit', 'dock.clear': 'Leeren', 'dock.toggle': 'Panel ein- oder ausklappen',
+    'con.empty': 'Noch keine Ausgabe. console.log()-Aufrufe und Fehler deiner Seite erscheinen hier.',
+    'prev.title': 'Vorschau', 'prev.lock': 'Netzwerk sperren', 'prev.reload': 'Vorschau neu laden',
+    'prev.lockHint': 'Fügt eine Content-Security-Policy hinzu, damit die Vorschau keine anderen Seiten kontaktieren kann.',
+    'prev.none': 'Keine HTML-Datei für die Vorschau.',
+    'dev.full': 'Voll', 'dev.tablet': 'Tablet', 'dev.mobile': 'Handy',
+    'dlg.cancel': 'Abbrechen', 'dlg.ok': 'OK', 'dlg.newTitle': 'Neue Datei', 'dlg.nameLabel': 'Dateiname',
+    'dlg.renameTitle': 'Datei umbenennen', 'dlg.deleteTitle': 'Datei löschen',
+    'dlg.deleteMsg': '„{name}“ löschen? Das lässt sich nicht rückgängig machen.',
+    'dlg.resetTitle': 'Projekt zurücksetzen', 'dlg.resetMsg': 'Alle Dateien durch das Startprojekt ersetzen?', 'dlg.reset': 'Zurücksetzen',
+    'err.last': 'Mindestens eine Datei muss übrig bleiben.', 'err.exists': 'Eine Datei mit diesem Namen gibt es schon.',
+    'err.name': 'Erlaubt: Buchstaben, Zahlen, Punkt, Bindestrich, Unterstrich, Leerzeichen (max. 63 Zeichen).',
+    'err.max': 'Limit von {n} Dateien erreicht.',
+    'toast.exported': 'ZIP exportiert', 'toast.imported': 'Importiert: {n} Dateien, übersprungen: {m}.',
+    'toast.reset': 'Projekt zurückgesetzt', 'toast.saved': 'Gespeichert', 'toast.downloaded': 'Datei heruntergeladen',
+    'toast.zipMissing': 'ZIP-Bibliothek nicht geladen. Prüfe deine Verbindung.',
+    'st.pos': 'Z {l}, Sp {c}', 'st.saved': 'Gespeichert', 'st.saving': 'Speichert...', 'st.error': 'Nicht gespeichert (Speicher blockiert)',
+    'st.by': 'von marcel533', 'st.temp': 'Wird beim Neuladen zurückgesetzt',
+    'legal.tos': 'Nutzungsbedingungen', 'legal.imprint': 'Impressum', 'legal.close': 'Schließen',
+    'legal.discord': 'Discord beitreten', 'legal.blocked': 'Dein Browser hat das Pop-up blockiert. Kopiere diesen Link und öffne ihn manuell:',
+    'pal.placeholder': 'Befehl eingeben...', 'pal.none': 'Kein passender Befehl',
+    'cmd.new': 'Neue Datei', 'cmd.rename': 'Aktuelle Datei umbenennen', 'cmd.delete': 'Aktuelle Datei löschen',
+    'cmd.run': 'Vorschau neu laden', 'cmd.import': 'Dateien oder ZIP importieren', 'cmd.export': 'Projekt als ZIP exportieren',
+    'cmd.download': 'Aktuelle Datei herunterladen', 'cmd.console': 'Konsole anzeigen', 'cmd.security': 'Sicherheitsbericht anzeigen',
+    'cmd.lock': 'Netzwerksperre in der Vorschau umschalten', 'cmd.full': 'Vorschau: volle Breite', 'cmd.tablet': 'Vorschau: Tablet-Breite',
+    'cmd.mobile': 'Vorschau: Handy-Breite', 'cmd.lang': 'Sprache wechseln', 'cmd.reset': 'Projekt zurücksetzen',
+    'cap.title': 'Bot-Schutz', 'cap.prompt': 'Löse die Aufgabe, um fortzufahren.', 'cap.ok': 'Bestätigen', 'cap.wrong': 'Falsch. Hier ist eine neue Aufgabe.', 'cap.last': 'Schon wieder falsch. Bei einem weiteren Fehler wirst du von dieser Seite geleitet.',
+    'r.eval': 'eval() führt einen String als Code aus', 'r.eval.fix': 'Daten mit JSON.parse parsen oder eine echte Funktion aufrufen.',
+    'r.func': 'new Function() kompiliert einen String zu Code', 'r.func.fix': 'Eine Funktion übergeben statt Code aus Strings zu bauen.',
+    'r.timer': 'setTimeout/setInterval mit String verhält sich wie eval', 'r.timer.fix': 'Eine Funktion übergeben.',
+    'r.inner': 'Zuweisung an innerHTML/outerHTML kann Scripts einschleusen (XSS)', 'r.inner.fix': 'textContent nutzen oder das Markup vorher bereinigen.',
+    'r.adjacent': 'insertAdjacentHTML fügt rohes HTML ein', 'r.adjacent.fix': 'Knoten mit createElement und textContent bauen.',
+    'r.write': 'document.write fügt rohes HTML ein', 'r.write.fix': 'Knoten mit createElement und textContent bauen.',
+    'r.inline': 'Inline-Eventhandler (onclick="...")', 'r.inline.fix': 'addEventListener nutzen. Funktioniert auch mit strenger CSP.',
+    'r.jsurl': 'javascript:-URL führt beim Klick Code aus', 'r.jsurl.fix': 'Einen Button mit Event-Listener nutzen.',
+    'r.blank': 'target="_blank" ohne rel="noopener"', 'r.blank.fix': 'rel="noopener noreferrer" ergänzen.',
+    'r.http': 'Ressource wird über http:// geladen', 'r.http.fix': 'https:// verwenden. Browser blockieren oder warnen bei Mixed Content.',
+    'r.sri': 'Externes Script ohne integrity-Attribut', 'r.sri.fix': 'integrity und crossorigin ergänzen oder die Datei selbst hosten.',
+    'r.secret': 'Möglicherweise fest eingetragenes Geheimnis', 'r.secret.fix': 'Entfernen und den Schlüssel erneuern. Alles im Client-Code ist öffentlich.',
+    'r.storage': 'Token oder Passwort im Web-Storage', 'r.storage.fix': 'httpOnly-Cookies bevorzugen. Jedes Script der Seite kann Web-Storage lesen.',
+    'r.postmsg': 'postMessage mit Ziel-Origin „*“', 'r.postmsg.fix': 'Genaue Origin angeben und beim Empfang event.origin prüfen.',
+    'r.iframe': '<iframe> ohne sandbox', 'r.iframe.fix': 'sandbox setzen und nur nötige Rechte freigeben.',
+    'r.random': 'Math.random() ist für Tokens nicht sicher', 'r.random.fix': 'crypto.getRandomValues() verwenden.'
+  }
+};
+let lang = 'en';
+const t = (k, v) => {
+  let s = (I18N[lang] && I18N[lang][k]) ?? I18N.en[k] ?? k;
+  if (v) for (const key of Object.keys(v)) s = s.split('{' + key + '}').join(String(v[key]));
+  return s;
+};
 
-        Object.keys(files).forEach(name => {
-            let content = files[name];
-            if (name.endsWith(".js") || name.endsWith(".css")) content += markText;
-            else if (name.endsWith(".html")) content += markHtml;
-            zip.file(name, content);
-        });
+/* ---------- State ---------- */
+let files = new Map();
+let current = 'index.html';
+let findings = [];
+let saveState = 'saved';
+let device = 'full';
+let dockTab = 'console';
+let dockCollapsed = false;
+let dockH = 210;
+let splitPct = 50;
+let lastEntry = null;
+let escTab = false;
 
-        // Hier war der Fehler (Zeilenumbruch korrigiert):
-        zip.file("Urheberrecht.txt", "Dieses Projekt wurde mit CodeStudio Ultimate erstellt.\nURL: " + siteUrl + "\nExport am: " + new Date().toLocaleString());
+const el = {
+  shell: $('#shell'), captcha: $('#captcha'), ed: $('#codeEditor'), hl: $('#hl'), gutter: $('#gutter'), edScroll: $('#edScroll'),
+  fileList: $('#fileList'), curName: $('#curName'), preview: $('#preview'), frame: $('#frame'), stage: $('#stage'),
+  work: $('#work'), split: $('#split'), dock: $('#dock'), dockCon: $('#dockCon'), dockSec: $('#dockSec'),
+  conCount: $('#conCount'), secCount: $('#secCount'), lockNet: $('#lockNet'), sidebar: $('#sidebar'),
+  secStatus: $('#secStatus'), secDetail: $('#secDetail'), toasts: $('#toasts')
+};
 
-        const blob = await zip.generateAsync({type:"blob"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "Projekt_Export.zip";
-        link.click();
-    }
+/* ---------- Starter project ---------- */
+function starter() {
+  const m = new Map();
+  m.set('index.html', `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    function renderFileList() {
-        const list = document.getElementById('file-list');
-        list.innerHTML = "";
-        Object.keys(files).forEach(name => {
-            const div = document.createElement('div');
-            div.className = `file-item ${name === currentFile ? 'active' : ''}`;
-            div.innerText = name;
-            div.onclick = () => {
-                files[currentFile] = document.getElementById('codeEditor').value;
-                currentFile = name;
-                document.getElementById('codeEditor').value = files[name];
-                renderFileList();
-                updatePreview();
-            };
-            list.appendChild(div);
-        });
-    }
+  <script src="script.js"><\/script>
+</body>
+</html>
+`);
+  m.set('style.css', '');
+  m.set('script.js', '');
+  return m;
+}
 
-    function updatePreview() {
-        files[currentFile] = document.getElementById('codeEditor').value;
-        scanCode(files[currentFile]);
-        const doc = document.getElementById('preview').contentWindow.document;
-        doc.open();
-        let css = `<style>${files["style.css"]}</style>`;
-        doc.write(css + files["index.html"]);
-        doc.close();
-    }
+/* ---------- Syntax highlighting ---------- */
+const esc = s => s.replace(/[&<>]/g, c => (c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;'));
+const span = (c, s) => `<span class="tk-${c}">${esc(s)}</span>`;
+function tokenize(text, re, pick) {
+  let out = '', last = 0, m;
+  re.lastIndex = 0;
+  while ((m = re.exec(text))) {
+    if (m[0] === '') { re.lastIndex++; continue; }
+    out += esc(text.slice(last, m.index)) + pick(m);
+    last = m.index + m[0].length;
+  }
+  return out + esc(text.slice(last));
+}
+const JS_RE = /(\/\*[\s\S]*?(?:\*\/|$)|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|`(?:\\[\s\S]|[^`\\])*`?)|(\b\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?\b)|\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|new|class|extends|import|export|from|default|async|await|try|catch|finally|throw|typeof|instanceof|in|of|this|null|undefined|true|false|void|delete|yield|static|super)\b|([A-Za-z_$][\w$]*)(?=\s*\()/g;
+const CSS_RE = /(\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?)|(@[\w-]+)|(#[0-9a-fA-F]{3,8}\b)|([\w-]+)(?=\s*:\s*[^;{}]*[;}])|((?:[A-Za-z_]|-(?=[A-Za-z_-]))[\w-]*)|(-?\d*\.?\d+(?:px|r?em|%|vh|vw|vmin|vmax|ch|ms|s|deg|fr)?)/g;
+const HTML_RE = /(<\!--[\s\S]*?(?:--\>|$))|(<(script|style)\b[^>]*>)([\s\S]*?)(<\/\3\s*>|$)|(<\/?[A-Za-z!][^>]*>?)/gi;
 
-    function addNewFile() {
-        const n = prompt("Dateiname:");
-        if(n) { files[n] = ""; renderFileList(); }
-    }
-
-    document.getElementById('codeEditor').addEventListener('input', updatePreview);
-
-    window.onload = () => {
-        initCaptcha();
-        document.getElementById('codeEditor').value = files[currentFile];
-        renderFileList();
-        updatePreview();
-    };
-function renderFileList() {
-    const list = document.getElementById('file-list');
-    list.innerHTML = "";
-    
-    Object.keys(files).forEach(name => {
-        const div = document.createElement('div');
-        div.className = `file-item ${name === currentFile ? 'active' : ''}`;
-        
-        // Dateiname und Lösch-Button erstellen
-        div.innerHTML = `
-            <span>${name}</span>
-            <span class="delete-btn" onclick="deleteFile(event, '${name}')">×</span>
-        `;
-        
-        div.onclick = () => {
-            files[currentFile] = document.getElementById('codeEditor').value;
-            currentFile = name;
-            document.getElementById('codeEditor').value = files[name];
-            renderFileList();
-            updatePreview();
-        };
-        list.appendChild(div);
+function hlTag(tag) {
+  const m = /^(<\/?)([A-Za-z!][\w:-]*)([\s\S]*?)(\/?>?)$/.exec(tag);
+  if (!m) return esc(tag);
+  return `<span class="tk-p">${esc(m[1])}</span><span class="tk-t">${esc(m[2])}</span>` +
+    tokenize(m[3], /("[^"]*"?|'[^']*'?)|([^\s"'=<>\/]+)/g, mm => (mm[1] ? span('s', mm[0]) : span('a', mm[0]))) +
+    `<span class="tk-p">${esc(m[4])}</span>`;
+}
+function highlight(text, kind) {
+  if (text.length > 250000) return esc(text);
+  if (kind === 'js') {
+    return tokenize(text, JS_RE, m => (m[1] ? span('c', m[0]) : m[2] ? span('s', m[0]) : m[3] ? span('n', m[0]) : m[4] ? span('k', m[0]) : span('f', m[0])));
+  }
+  if (kind === 'css') {
+    return tokenize(text, CSS_RE, m => (m[1] ? span('c', m[0]) : m[2] ? span('s', m[0]) : m[3] ? span('k', m[0]) : m[4] ? span('n', m[0]) : m[5] ? span('q', m[0]) : m[6] ? esc(m[0]) : span('n', m[0])));
+  }
+  if (kind === 'html') {
+    return tokenize(text, HTML_RE, m => {
+      if (m[1]) return span('c', m[0]);
+      if (m[2]) return hlTag(m[2]) + highlight(m[4], m[3].toLowerCase() === 'script' ? 'js' : 'css') + (m[5] ? hlTag(m[5]) : '');
+      return hlTag(m[6]);
     });
-    
-    const fileNameDisplay = document.getElementById('current-filename');
-    if(fileNameDisplay) fileNameDisplay.innerText = currentFile;
+  }
+  return esc(text);
+}
+function kindOf(name) {
+  const e = extOf(name);
+  if (['html', 'htm', 'svg'].includes(e)) return 'html';
+  if (e === 'css') return 'css';
+  if (['js', 'mjs', 'json'].includes(e)) return 'js';
+  return 'text';
 }
 
-function deleteFile(event, name) {
-    // Verhindert, dass die Datei beim Klicken auf das X gleichzeitig ausgewählt wird
-    event.stopPropagation();
+/* ---------- Security scanner ---------- */
+const SC = {
+  js: ['js', 'mjs', 'html', 'htm', 'svg'],
+  html: ['html', 'htm'],
+  web: ['html', 'htm', 'css', 'js', 'mjs', 'svg'],
+  any: TEXT_EXT
+};
+const RULES = [
+  { id: 'eval', sev: 'high', scope: SC.js, re: [/\beval\s*\(/g] },
+  { id: 'func', sev: 'high', scope: SC.js, re: [/\bnew\s+Function\s*\(/g] },
+  { id: 'secret', sev: 'high', scope: SC.any, re: [
+    /\bAKIA[0-9A-Z]{16}\b/g, /\bgh[pousr]_[A-Za-z0-9]{36,}\b/g, /\bxox[baprs]-[A-Za-z0-9-]{10,}/g,
+    /\bAIza[0-9A-Za-z_-]{35}\b/g, /-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/g,
+    /\b(?:api[_-]?key|secret|token|passwd|password|pwd)\w*["']?\s*[:=]\s*["'][^"'\s]{8,}["']/gi
+  ] },
+  { id: 'jsurl', sev: 'high', scope: SC.html, re: [/\b(?:href|src|action|formaction)\s*=\s*["']?\s*javascript:/gi] },
+  { id: 'timer', sev: 'med', scope: SC.js, re: [/\bset(?:Timeout|Interval)\s*\(\s*["'`]/g] },
+  { id: 'inner', sev: 'med', scope: SC.js, re: [/\.(?:inner|outer)HTML\s*\+?=(?!=)/g] },
+  { id: 'adjacent', sev: 'med', scope: SC.js, re: [/\.insertAdjacentHTML\s*\(/g] },
+  { id: 'write', sev: 'med', scope: SC.js, re: [/\bdocument\.write(?:ln)?\s*\(/g] },
+  { id: 'http', sev: 'med', scope: SC.web, re: [
+    /\b(?:src|action|poster|formaction)\s*=\s*["']\s*http:\/\/[^"']*/gi, /<link\b[^>]*\bhref\s*=\s*["']\s*http:\/\/[^"']*/gi,
+    /url\(\s*["']?http:\/\/[^)"']*/gi, /\b(?:fetch|open)\s*\(\s*["'`]http:\/\/[^"'`]*/gi
+  ], filter: m => !/http:\/\/(?:localhost|127\.0\.0\.1)/i.test(m[0]) },
+  { id: 'sri', sev: 'med', scope: SC.html, re: [/<script\b[^>]*\bsrc\s*=\s*["']?(?:https?:)?\/\/[^>]*>/gi], filter: m => !/\bintegrity\s*=/i.test(m[0]) },
+  { id: 'storage', sev: 'med', scope: SC.js, re: [/\b(?:local|session)Storage\.setItem\s*\(\s*["'][^"']*(?:token|jwt|passw|secret|apikey)/gi] },
+  { id: 'postmsg', sev: 'med', scope: SC.js, re: [/\.postMessage\s*\([^)]*,\s*["']\*["']/g] },
+  { id: 'random', sev: 'med', scope: SC.js, re: [/Math\.random\s*\(/g], filter: (m, line) => /token|secret|key|pass|nonce|session|csrf|salt/i.test(line) },
+  { id: 'inline', sev: 'low', scope: SC.html, re: [/<[a-z][^>]*\son[a-z]+\s*=\s*["']/gi] },
+  { id: 'blank', sev: 'low', scope: SC.html, re: [/<a\b[^>]*\btarget\s*=\s*["']?_blank[^>]*>/gi], filter: m => !/\brel\s*=\s*["'][^"']*\b(?:noopener|noreferrer)\b/i.test(m[0]) },
+  { id: 'iframe', sev: 'low', scope: SC.html, re: [/<iframe\b(?![^>]*\bsandbox\b)[^>]*>/gi] }
+];
+const SEV_RANK = { high: 0, med: 1, low: 2 };
 
-    // Sicherheitsabfrage
-    if (Object.keys(files).length <= 1) {
-        alert("Mindestens eine Datei muss übrig bleiben!");
-        return;
-    }
-
-    if (confirm(`Möchtest du die Datei "${name}" wirklich löschen?`)) {
-        delete files[name];
-
-        // Falls die gelöschte Datei gerade offen war, zur ersten verfügbaren Datei springen
-        if (currentFile === name) {
-            currentFile = Object.keys(files)[0];
-            document.getElementById('codeEditor').value = files[currentFile];
+function lineStarts(text) {
+  const a = [0];
+  for (let i = 0; i < text.length; i++) if (text.charCodeAt(i) === 10) a.push(i + 1);
+  return a;
+}
+function lineOf(starts, idx) {
+  let lo = 0, hi = starts.length - 1;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid] <= idx) lo = mid; else hi = mid - 1; }
+  return lo + 1;
+}
+function scanAll() {
+  const out = [], seen = new Set();
+  for (const [name, text] of files) {
+    if (text.length > 500000) continue;
+    const ext = extOf(name);
+    const starts = lineStarts(text);
+    for (const r of RULES) {
+      if (!r.scope.includes(ext)) continue;
+      for (const re of r.re) {
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(text))) {
+          if (m[0] === '') { re.lastIndex++; continue; }
+          const line = lineOf(starts, m.index);
+          if (r.filter) {
+            const end = starts[line] !== undefined ? starts[line] - 1 : text.length;
+            if (!r.filter(m, text.slice(starts[line - 1], end))) continue;
+          }
+          const key = r.id + '|' + name + '|' + line;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push({ id: r.id, sev: r.sev, file: name, line });
         }
-
-        renderFileList();
-        updatePreview();
+      }
     }
+  }
+  const order = [...files.keys()];
+  out.sort((a, b) => SEV_RANK[a.sev] - SEV_RANK[b.sev] || order.indexOf(a.file) - order.indexOf(b.file) || a.line - b.line);
+  return out;
 }
-</script>
+const scoreOf = list => clamp(100 - list.reduce((s, f) => s + (f.sev === 'high' ? 25 : f.sev === 'med' ? 10 : 3), 0), 0, 100);
 
+/* ---------- Preview ---------- */
+const isHtml = n => /\.html?$/i.test(n);
+const escScript = s => s.replace(/<\/(script)/gi, '<\\/$1');
+const escStyle = s => s.replace(/<\/(style)/gi, '<\\/$1');
+const CSP = "default-src 'none'; img-src data: blob:; media-src data: blob:; font-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'";
+const BRIDGE = [
+  '(function(){',
+  'var send=function(l,a){try{parent.postMessage({__cs:1,level:l,args:a},"*")}catch(e){}};',
+  'var fmt=function(a){try{if(typeof a==="string")return a;if(a instanceof Error)return a.stack||a.message;',
+  'if(typeof a==="function")return String(a);var s=JSON.stringify(a,function(k,v){return typeof v==="bigint"?v+"n":v},2);return s===undefined?String(a):s}catch(e){return String(a)}};',
+  '["log","info","warn","error","debug"].forEach(function(l){var o=console[l];console[l]=function(){',
+  'send(l,[].map.call(arguments,fmt));if(o)o.apply(console,arguments)}});',
+  'window.addEventListener("error",function(e){send("error",[e.message+(e.lineno?" ("+e.lineno+":"+e.colno+")":"")])});',
+  'window.addEventListener("unhandledrejection",function(e){send("error",["Unhandled rejection: "+fmt(e.reason)])});',
+  '})();'
+].join('');
+
+function getEntry() {
+  if (isHtml(current)) return current;
+  if (files.has('index.html')) return 'index.html';
+  for (const n of files.keys()) if (isHtml(n)) return n;
+  return null;
+}
+function afterDoctype(doc, ins) {
+  const m = /^\s*<!doctype[^>]*>/i.exec(doc);
+  return m ? m[0] + ins + doc.slice(m[0].length) : ins + doc;
+}
+function buildDoc() {
+  const entry = getEntry();
+  lastEntry = entry;
+  if (!entry) {
+    return `<!DOCTYPE html><meta charset="utf-8"><body style="margin:0;height:100vh;display:grid;place-items:center;font:14px system-ui,sans-serif;color:#777">${esc(t('prev.none'))}`;
+  }
+  let doc = files.get(entry);
+  const used = new Set();
+  const local = ref => { const clean = ref.split(/[?#]/)[0].replace(/^\.\//, ''); return files.has(clean) ? clean : null; };
+
+  doc = doc.replace(/<link\b[^>]*>/gi, tag => {
+    if (!/\brel\s*=\s*["']?stylesheet/i.test(tag)) return tag;
+    const m = tag.match(/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+    if (!m) return tag;
+    const name = local(m[1] ?? m[2] ?? m[3]);
+    if (!name) return tag;
+    used.add(name);
+    return `<style data-file="${name}">\n${escStyle(files.get(name))}\n</style>`;
+  });
+  doc = doc.replace(/<script\b([^>]*?)\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)')([^>]*)>\s*<\/script\s*>/gi, (all, a, d, s, b) => {
+    const name = local(d ?? s ?? '');
+    if (!name) return all;
+    used.add(name);
+    return `<script${a}${b}>\n${escScript(files.get(name))}\n<\/script>`;
+  });
+  /* style.css / script.js werden nur eingebunden, wenn die HTML-Datei sie selbst referenziert (wie im echten Browser und im ZIP-Export). */
+  const prelude = '<meta charset="utf-8">' +
+    (el.lockNet.checked ? `<meta http-equiv="Content-Security-Policy" content="${CSP}">` : '') +
+    '<scr' + 'ipt>' + BRIDGE + '</scr' + 'ipt>';
+  return /<head\b[^>]*>/i.test(doc) ? doc.replace(/<head\b[^>]*>/i, m => m + prelude) : afterDoctype(doc, prelude);
+}
+function runPreview() {
+  clearConsole();
+  el.preview.srcdoc = buildDoc();
+}
+let previewTimer;
+const schedulePreview = () => { clearTimeout(previewTimer); previewTimer = setTimeout(runPreview, 350); };
+
+/* ---------- Console bridge ---------- */
+let conRows = 0, conIssues = 0;
+function conEmpty() {
+  if (el.dockCon.children.length === 0) {
+    const d = document.createElement('div');
+    d.className = 'empty'; d.dataset.empty = '1'; d.textContent = t('con.empty');
+    el.dockCon.append(d);
+  }
+}
+function clearConsole() {
+  el.dockCon.replaceChildren(); conRows = 0; conIssues = 0;
+  el.conCount.hidden = true; conEmpty();
+}
+function addCon(level, text) {
+  const empty = $('[data-empty]', el.dockCon);
+  if (empty) empty.remove();
+  const near = el.dockCon.scrollHeight - el.dockCon.scrollTop - el.dockCon.clientHeight < 40;
+  const row = document.createElement('div');
+  row.className = 'con-row ' + level;
+  row.textContent = text.length > 4000 ? text.slice(0, 4000) + '...' : text;
+  el.dockCon.append(row);
+  if (++conRows > 300) { el.dockCon.firstElementChild.remove(); conRows--; }
+  if (level === 'error' || level === 'warn') {
+    conIssues++;
+    el.conCount.textContent = String(conIssues);
+    el.conCount.className = 'count ' + (level === 'error' ? 'bad' : 'warn');
+    el.conCount.hidden = false;
+  }
+  if (near) el.dockCon.scrollTop = el.dockCon.scrollHeight;
+}
+window.addEventListener('message', e => {
+  if (e.source !== el.preview.contentWindow) return;
+  const d = e.data;
+  if (!d || d.__cs !== 1 || !Array.isArray(d.args)) return;
+  const level = ['log', 'info', 'warn', 'error', 'debug'].includes(d.level) ? d.level : 'log';
+  addCon(level, d.args.map(a => String(a)).join(' '));
+});
+
+/* ---------- Editor ---------- */
+let gutterSig = '';
+function markers() {
+  const m = new Map();
+  for (const f of findings) {
+    if (f.file !== current) continue;
+    const prev = m.get(f.line);
+    if (!prev || SEV_RANK[f.sev] < SEV_RANK[prev]) m.set(f.line, f.sev);
+  }
+  return m;
+}
+function renderGutter(force) {
+  const n = el.ed.value.split('\n').length;
+  const mk = markers();
+  const sig = n + '|' + [...mk].join(',');
+  if (!force && sig === gutterSig) return;
+  gutterSig = sig;
+  let html = '';
+  for (let i = 1; i <= n; i++) html += `<div class="ln${mk.has(i) ? ' m-' + mk.get(i) : ''}">${i}</div>`;
+  el.gutter.innerHTML = html;
+}
+function renderHL() {
+  el.hl.innerHTML = highlight(el.ed.value, kindOf(current)) + '\n';
+  renderGutter();
+}
+function updatePos() {
+  const v = el.ed.value.slice(0, el.ed.selectionStart);
+  $('#stPos').textContent = t('st.pos', { l: v.split('\n').length, c: v.length - v.lastIndexOf('\n') });
+}
+function updateStatus() {
+  updatePos();
+  $('#stLang').textContent = { html: 'HTML', css: 'CSS', js: 'JavaScript', text: 'Text' }[kindOf(current)];
+  const bytes = new Blob([el.ed.value]).size;
+  $('#stSize').textContent = bytes < 1024 ? bytes + ' B' : (bytes / 1024).toFixed(1) + ' KB';
+}
+function commit() { if (files.has(current)) files.set(current, el.ed.value); }
+function insertText(text) {
+  el.ed.focus();
+  if (!document.execCommand('insertText', false, text)) {
+    el.ed.setRangeText(text, el.ed.selectionStart, el.ed.selectionEnd, 'end');
+    el.ed.dispatchEvent(new Event('input'));
+  }
+}
+function indent(back) {
+  const v = el.ed.value, s = el.ed.selectionStart, en = el.ed.selectionEnd;
+  if (s === en && !back) { insertText('  '); return; }
+  const ls = v.lastIndexOf('\n', s - 1) + 1;
+  const blockEnd = en > s && v[en - 1] === '\n' ? en - 1 : en;
+  let le = v.indexOf('\n', blockEnd);
+  if (le === -1) le = v.length;
+  const lines = v.slice(ls, le).split('\n');
+  const next = back ? lines.map(l => l.replace(/^(?: {1,2}|\t)/, '')) : lines.map(l => '  ' + l);
+  const block = lines.join('\n'), nb = next.join('\n');
+  el.ed.setSelectionRange(ls, le);
+  insertText(nb);
+  const d1 = next[0].length - lines[0].length;
+  el.ed.setSelectionRange(Math.max(ls, s + d1), Math.max(ls, en + (nb.length - block.length)));
+}
+function onInput() {
+  files.set(current, el.ed.value);
+  renderHL();
+  updateStatus();
+  scheduleScan();
+  schedulePreview();
+  persist();
+}
+el.ed.addEventListener('input', onInput);
+el.ed.addEventListener('scroll', () => { el.ed.scrollTop = 0; el.ed.scrollLeft = 0; });
+el.ed.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { escTab = true; return; }
+  if (e.key === 'Tab' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    if (escTab) { escTab = false; return; }
+    e.preventDefault(); indent(e.shiftKey); return;
+  }
+  escTab = false;
+  if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const before = el.ed.value.slice(0, el.ed.selectionStart);
+    const line = before.slice(before.lastIndexOf('\n') + 1);
+    const ind = line.match(/^[ \t]*/)[0];
+    const extra = /[{\[(]\s*$/.test(line) ? '  ' : '';
+    if (ind || extra) { e.preventDefault(); insertText('\n' + ind + extra); }
+  }
+});
+document.addEventListener('selectionchange', () => { if (document.activeElement === el.ed) updatePos(); });
+el.gutter.addEventListener('click', () => el.ed.focus());
+
+/* ---------- Files ---------- */
+function openFile(name) {
+  if (!files.has(name)) return;
+  commit();
+  current = name;
+  el.ed.value = files.get(name);
+  el.edScroll.scrollTo(0, 0);
+  renderHL(); renderGutter(true); renderFileList(); updateBar(); updateStatus();
+  if (getEntry() !== lastEntry) schedulePreview();
+  persist();
+}
+function updateBar() { el.curName.textContent = current; }
+function renderFileList() {
+  el.fileList.replaceChildren();
+  for (const name of files.keys()) {
+    const li = document.createElement('li');
+    li.className = 'file' + (name === current ? ' active' : '');
+    const open = document.createElement('button');
+    open.type = 'button'; open.className = 'file-open'; open.textContent = name; open.title = name;
+    if (name === current) open.setAttribute('aria-current', 'true');
+    open.addEventListener('click', () => { openFile(name); closeDrawer(); });
+    open.addEventListener('dblclick', () => renameFile(name));
+    open.addEventListener('keydown', e => { if (e.key === 'F2') { e.preventDefault(); renameFile(name); } });
+    const del = document.createElement('button');
+    del.type = 'button'; del.className = 'icon-btn file-del'; del.textContent = '\u00d7';
+    del.setAttribute('aria-label', t('file.delete') + ': ' + name); del.title = t('file.delete');
+    del.addEventListener('click', ev => { ev.stopPropagation(); deleteFile(name); });
+    li.append(open, del);
+    el.fileList.append(li);
+  }
+}
+const validateName = (v, ignore) => {
+  if (!NAME_RE.test(v)) return t('err.name');
+  if (v !== ignore && files.has(v)) return t('err.exists');
+  return '';
+};
+const template = name => (isHtml(name) ? '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title></title>\n</head>\n<body>\n\n</body>\n</html>\n' : '');
+async function newFile() {
+  if (files.size >= MAX_FILES) { toast(t('err.max', { n: MAX_FILES }), 'warn'); return; }
+  const name = await ask({ title: t('dlg.newTitle'), label: t('dlg.nameLabel'), value: '', validate: v => validateName(v, null) });
+  if (!name) return;
+  commit();
+  files.set(name, template(name));
+  openFile(name);
+  scheduleScan();
+  el.ed.focus();
+}
+async function renameFile(name) {
+  commit();
+  const nn = await ask({ title: t('dlg.renameTitle'), label: t('dlg.nameLabel'), value: name, validate: v => validateName(v, name) });
+  if (!nn || nn === name) return;
+  const m = new Map();
+  for (const [k, v] of files) m.set(k === name ? nn : k, v);
+  files = m;
+  if (current === name) current = nn;
+  renderHL(); renderFileList(); updateBar(); updateStatus(); scheduleScan(); schedulePreview(); persist();
+}
+async function deleteFile(name) {
+  if (files.size <= 1) { toast(t('err.last'), 'warn'); return; }
+  const ok = await ask({ title: t('dlg.deleteTitle'), message: t('dlg.deleteMsg', { name }), okText: t('file.delete'), danger: true });
+  if (!ok) return;
+  commit();
+  files.delete(name);
+  if (current === name) { current = files.keys().next().value; el.ed.value = files.get(current); }
+  renderHL(); renderGutter(true); renderFileList(); updateBar(); updateStatus(); scheduleScan(); schedulePreview(); persist();
+}
+async function resetProject() {
+  const ok = await ask({ title: t('dlg.resetTitle'), message: t('dlg.resetMsg'), okText: t('dlg.reset'), danger: true });
+  if (!ok) return;
+  files = starter(); current = 'index.html';
+  el.ed.value = files.get(current);
+  renderHL(); renderGutter(true); renderFileList(); updateBar(); updateStatus(); scheduleScan(); runPreview(); persist();
+  toast(t('toast.reset'));
+}
+
+/* ---------- Import / export ---------- */
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+async function exportZip() {
+  if (typeof JSZip === 'undefined') { toast(t('toast.zipMissing'), 'warn'); return; }
+  commit();
+  const zip = new JSZip();
+  const mark = `ERSTELLT MIT: ${SITE_URL}`;
+  for (const [name, content] of files) {
+    const e = extOf(name);
+    let out = content;
+    if (!content.includes(SITE_URL)) {
+      if (e === 'js' || e === 'mjs' || e === 'css') out += `\n\n/* ${mark} */`;
+      else if (e === 'html' || e === 'htm') out += `\n\n<\!-- ${mark} -->`;
+    }
+    zip.file(name, out);
+  }
+  zip.file('Urheberrecht.txt',
+    'Dieses Projekt wurde mit CodeStudio Pro erstellt. / This project was created with CodeStudio Pro.\n' +
+    'Autor / Author: marcel533\nURL: ' + SITE_URL + '\nExport: ' + new Date().toLocaleString());
+  const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+  download(blob, 'Projekt_Export.zip');
+  toast(t('toast.exported'));
+}
+function downloadCurrent() {
+  commit();
+  download(new Blob([files.get(current)], { type: 'text/plain;charset=utf-8' }), current);
+  toast(t('toast.downloaded'));
+}
+function uniqueName(name) {
+  if (!files.has(name)) return name;
+  const dot = name.lastIndexOf('.');
+  const base = dot > 0 ? name.slice(0, dot) : name, ext = dot > 0 ? name.slice(dot) : '';
+  for (let i = 2; i < 1000; i++) { const n = `${base}-${i}${ext}`; if (!files.has(n) && NAME_RE.test(n)) return n; }
+  return null;
+}
+async function importFiles(list) {
+  let added = 0, skipped = 0;
+  const addOne = (rawName, text) => {
+    const name = rawName.split(/[\\/]/).pop();
+    if (!NAME_RE.test(name) || !TEXT_EXT.includes(extOf(name)) || text.length > MAX_BYTES || files.size >= MAX_FILES) { skipped++; return; }
+    const final = uniqueName(name);
+    if (!final) { skipped++; return; }
+    files.set(final, text); added++;
+  };
+  for (const f of list) {
+    if (f.size > 5000000) { skipped++; continue; }
+    if (extOf(f.name) === 'zip') {
+      if (typeof JSZip === 'undefined') { toast(t('toast.zipMissing'), 'warn'); continue; }
+      try {
+        const zip = await JSZip.loadAsync(f);
+        const entries = zip.file(/.*/).slice(0, 200);
+        for (const entry of entries) {
+          if (entry.name.includes('__MACOSX') || entry.name.split('/').pop().startsWith('.')) { skipped++; continue; }
+          if (entry._data && entry._data.uncompressedSize > MAX_BYTES) { skipped++; continue; }
+          addOne(entry.name, await entry.async('string'));
+        }
+      } catch { skipped++; }
+    } else {
+      try { addOne(f.name, await f.text()); } catch { skipped++; }
+    }
+  }
+  if (added) { commit(); renderFileList(); scheduleScan(); schedulePreview(); persist(); }
+  toast(t('toast.imported', { n: added, m: skipped }));
+}
+$('#fileInput').addEventListener('change', e => { importFiles([...e.target.files]); e.target.value = ''; });
+
+/* ---------- Security panel ---------- */
+let scanTimer;
+const scheduleScan = () => { clearTimeout(scanTimer); scanTimer = setTimeout(runScan, 250); };
+function runScan() {
+  commit();
+  findings = scanAll();
+  renderSecurity();
+  renderGutter(true);
+}
+function renderSecurity() {
+  const n = findings.length, score = scoreOf(findings);
+  const worst = findings[0] ? findings[0].sev : null;
+  el.secStatus.textContent = n ? '\u26a0 ' + t('sec.risk') : '\u2713 ' + t('sec.safe');
+  el.secStatus.className = 'sec-status ' + (!n ? 'ok' : worst === 'high' ? 'bad' : 'warn');
+  el.secDetail.textContent = n ? t('sec.detail', { n, s: score }) : t('sec.detail', { n: 0, s: 100 });
+  el.secCount.hidden = !n;
+  el.secCount.textContent = String(n);
+  el.secCount.className = 'count ' + (worst === 'high' ? 'bad' : 'warn');
+
+  el.dockSec.replaceChildren();
+  if (!n) {
+    const d = document.createElement('div');
+    d.className = 'empty'; d.textContent = t('sec.empty', { n: files.size, r: RULES.length });
+    el.dockSec.append(d);
+  } else {
+    const ul = document.createElement('ul');
+    ul.className = 'findings';
+    for (const f of findings) {
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'finding';
+      const sev = document.createElement('span'); sev.className = 'sev ' + f.sev; sev.textContent = t('sec.' + f.sev);
+      const main = document.createElement('span');
+      const msg = document.createElement('div'); msg.textContent = t('r.' + f.id);
+      const fix = document.createElement('div'); fix.className = 'f-fix'; fix.textContent = t('r.' + f.id + '.fix');
+      main.append(msg, fix);
+      const loc = document.createElement('span'); loc.className = 'f-loc'; loc.textContent = f.file + ':' + f.line;
+      b.append(sev, main, loc);
+      b.addEventListener('click', () => jumpTo(f.file, f.line));
+      li.append(b); ul.append(li);
+    }
+    el.dockSec.append(ul);
+  }
+  const note = document.createElement('div');
+  note.className = 'sec-note'; note.textContent = t('sec.note');
+  el.dockSec.append(note);
+}
+function jumpTo(file, line) {
+  if (file !== current) openFile(file);
+  setView('editor');
+  const v = el.ed.value;
+  let off = 0;
+  for (let i = 1; i < line; i++) { off = v.indexOf('\n', off) + 1; if (off === 0) break; }
+  let end = v.indexOf('\n', off); if (end === -1) end = v.length;
+  el.ed.focus({ preventScroll: true });
+  el.ed.setSelectionRange(off, end);
+  el.edScroll.scrollTop = Math.max(0, (line - 1) * 20 - el.edScroll.clientHeight / 3);
+}
+
+/* ---------- Dock ---------- */
+function showDock(tab) {
+  dockTab = tab;
+  $('#tabConsole').setAttribute('aria-selected', String(tab === 'console'));
+  $('#tabSec').setAttribute('aria-selected', String(tab === 'security'));
+  el.dockCon.hidden = tab !== 'console';
+  el.dockSec.hidden = tab !== 'security';
+  $('#clearCon').hidden = tab !== 'console';
+  if (dockCollapsed) toggleDock(false);
+}
+function toggleDock(collapse) {
+  dockCollapsed = collapse;
+  el.dock.classList.toggle('collapsed', collapse);
+  const h = collapse ? 34 : dockH;
+  if (motionOK()) gsap.to(el.dock, { height: h, duration: 0.22, ease: 'power2.out' });
+  else el.dock.style.height = h + 'px';
+}
+$('#tabConsole').addEventListener('click', () => showDock('console'));
+$('#tabSec').addEventListener('click', () => showDock('security'));
+$('#secCard').addEventListener('click', () => { showDock('security'); closeDrawer(); });
+$('#clearCon').addEventListener('click', clearConsole);
+$('#dockToggle').addEventListener('click', () => toggleDock(!dockCollapsed));
+
+/* ---------- Layout: resizing, device, views ---------- */
+function drag(handle, onMove, vertical) {
+  handle.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+    document.body.classList.add('dragging');
+    document.body.classList.toggle('dragging-y', !!vertical);
+    const up = () => {
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', up);
+      handle.removeEventListener('pointercancel', up);
+      document.body.classList.remove('dragging', 'dragging-y');
+      persist();
+    };
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', up);
+    handle.addEventListener('pointercancel', up);
+  });
+}
+function setSplit(p) { splitPct = clamp(p, 20, 80); el.split.style.setProperty('--split', splitPct.toFixed(1) + '%'); }
+drag($('#handle'), e => { const r = el.split.getBoundingClientRect(); setSplit(((e.clientX - r.left) / r.width) * 100); });
+$('#handle').addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') { setSplit(splitPct - 2); persist(); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { setSplit(splitPct + 2); persist(); e.preventDefault(); }
+});
+drag($('#grip'), e => {
+  const r = el.work.getBoundingClientRect();
+  dockH = clamp(r.bottom - e.clientY, 80, r.height - 160);
+  if (dockCollapsed) { dockCollapsed = false; el.dock.classList.remove('collapsed'); }
+  el.dock.style.height = dockH + 'px';
+}, true);
+
+function setDevice(w) {
+  device = w;
+  $$('#deviceSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.w === w)));
+  const avail = el.stage.clientWidth - 20;
+  const target = w === 'full' ? avail : Math.min(Number(w), avail);
+  if (motionOK()) {
+    gsap.to(el.frame, { width: target, duration: 0.3, ease: 'power2.out', onComplete: () => { if (w === 'full') el.frame.style.width = ''; } });
+  } else {
+    el.frame.style.width = w === 'full' ? '' : target + 'px';
+  }
+}
+$$('#deviceSeg button').forEach(b => b.addEventListener('click', () => setDevice(b.dataset.w)));
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(() => { $('#frameW').textContent = Math.round(el.frame.clientWidth) + ' px'; }).observe(el.frame);
+}
+function setView(v) {
+  el.work.dataset.view = v;
+  $$('#viewSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+}
+$$('#viewSeg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+function closeDrawer() { el.sidebar.classList.remove('open'); }
+$('#menuBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  const open = !el.sidebar.classList.contains('open');
+  el.sidebar.classList.toggle('open', open);
+  if (open && motionOK()) gsap.from(el.sidebar, { x: -24, autoAlpha: 0, duration: 0.2, clearProps: 'transform,opacity,visibility' });
+});
+document.addEventListener('click', e => { if (el.sidebar.classList.contains('open') && !el.sidebar.contains(e.target) && !e.target.closest('dialog')) closeDrawer(); });
+
+el.lockNet.addEventListener('change', () => { runPreview(); persist(); });
+$('#reloadBtn').addEventListener('click', runPreview);
+$('#newFileBtn').addEventListener('click', newFile);
+$('#exportBtn').addEventListener('click', exportZip);
+$('#importBtn').addEventListener('click', () => $('#fileInput').click());
+
+/* ---------- Dialogs, palette, toast ---------- */
+const dlg = $('#dlg'), dlgForm = $('#dlgForm'), dlgInput = $('#dlgInput'), dlgErr = $('#dlgErr');
+function popIn(node) {
+  if (motionOK()) gsap.fromTo(node, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.16, ease: 'power2.out', clearProps: 'transform,opacity,visibility' });
+}
+function ask({ title, message = '', label = '', value = '', validate = null, okText = '', danger = false }) {
+  return new Promise(resolve => {
+    $('#dlgTitle').textContent = title;
+    $('#dlgMsg').textContent = message; $('#dlgMsg').hidden = !message;
+    $('#dlgLabelWrap').hidden = !label; $('#dlgLabel').textContent = label;
+    dlgInput.value = value; dlgErr.hidden = true;
+    const ok = $('#dlgOk');
+    ok.textContent = okText || t('dlg.ok'); ok.className = 'btn ' + (danger ? 'danger' : 'primary');
+    $('#dlgCancel').textContent = t('dlg.cancel');
+    let done = false;
+    const finish = v => {
+      if (done) return; done = true;
+      $('#dlgOk').removeEventListener('click', onSubmit);
+      dlgInput.removeEventListener('keydown', onKey);
+      $('#dlgCancel').removeEventListener('click', onCancel);
+      dlg.removeEventListener('close', onCancel);
+      if (dlg.open) dlg.close();
+      resolve(v);
+    };
+    const onCancel = () => finish(label ? null : false);
+    const onSubmit = e => {
+      if (e) e.preventDefault();
+      if (label) {
+        const v = dlgInput.value.trim();
+        const err = validate ? validate(v) : '';
+        if (err) { dlgErr.textContent = err; dlgErr.hidden = false; return; }
+        finish(v);
+      } else finish(true);
+    };
+    const onKey = e => { if (e.key === 'Enter') onSubmit(e); };
+    $('#dlgOk').addEventListener('click', onSubmit);
+    dlgInput.addEventListener('keydown', onKey);
+    $('#dlgCancel').addEventListener('click', onCancel);
+    dlg.addEventListener('close', onCancel);
+    dlg.showModal(); popIn(dlgForm); /* nie das <dialog> selbst animieren: GSAP wirft es sonst aus dem Top-Layer */
+    if (label) {
+      dlgInput.focus();
+      const dot = value.lastIndexOf('.');
+      dlgInput.setSelectionRange(0, dot > 0 ? dot : value.length);
+    }
+  });
+}
+function toast(msg, kind = '') {
+  const n = document.createElement('div');
+  n.className = 'toast ' + kind; n.textContent = msg;
+  el.toasts.append(n);
+  if (motionOK()) gsap.from(n, { y: 8, autoAlpha: 0, duration: 0.2 });
+  setTimeout(() => {
+    const rm = () => n.remove();
+    if (motionOK()) gsap.to(n, { autoAlpha: 0, duration: 0.2, onComplete: rm }); else rm();
+  }, 2600);
+}
+
+/* ---------- Legal pages (Terms of Service, Impressum) ---------- */
+const LEGAL = {
+  en: {
+    tos: { title: 'Terms of Service', meta: 'Last updated: October 2026', sections: [
+      ['1. Acceptance', 'By using CodeStudio Pro (the "Service") you agree to these terms. If you do not agree, please do not use the Service.'],
+      ['2. What the Service is', 'CodeStudio Pro is a free code editor that runs in your browser. Your files are processed locally on your device. They are not uploaded to any server by the Service and are discarded when you reload the page. Export what you want to keep (ZIP or single file).'],
+      ['3. Your responsibility', 'You are responsible for the code and content you write, import or run in the preview. You must not use the Service for illegal purposes or to create or distribute malware, phishing pages or content that violates the rights of others.'],
+      ['4. Security scanner', 'The built-in security scan is pattern-based. It finds common mistakes but is not a security audit. A clean result does not guarantee that your code is safe.'],
+      ['5. Third-party components', 'The Service loads the libraries GSAP and JSZip from the jsDelivr CDN. When these load, your IP address is transmitted to the CDN provider. External links (for example to Discord) lead to third-party sites that have their own terms and privacy policies.'],
+      ['6. Exported files', 'Files exported as ZIP contain an attribution note ("ERSTELLT MIT" / "Urheberrecht.txt") pointing to {site}. Your code remains yours.'],
+      ['7. No warranty', 'The Service is provided "as is" and "as available", without warranty of any kind, and may change or be discontinued at any time.'],
+      ['8. Liability', 'To the extent permitted by law, the operator is not liable for damages arising from the use of the Service, including data loss. This does not limit liability for intent, gross negligence, or injury to life, body or health, or liability under mandatory law.'],
+      ['9. Changes', 'These terms may be updated. The version shown here applies.'],
+      ['10. Contact', 'Questions about these terms? Write to {mail} or join us on Discord:\n{discord}']
+    ] },
+    imprint: { title: 'Legal Notice (Impressum)', meta: 'Information pursuant to the German Digital Services Act (DDG)', sections: [
+      ['Operator', 'marcel533'],
+      ['Contact', 'Email: {mail}\n{discord}'],
+      ['Website', '{site}'],
+      ['Liability for content', 'The contents of this site were created with care. No guarantee is given for correctness, completeness or timeliness.'],
+      ['Liability for links', 'This site links to external third-party sites (for example Discord). The operator has no influence on their content and is not responsible for it. The respective provider is responsible for linked content.']
+    ] }
+  },
+  de: {
+    tos: { title: 'Nutzungsbedingungen', meta: 'Stand: Oktober 2026', sections: [
+      ['1. Geltung', 'Mit der Nutzung von CodeStudio Pro (dem „Dienst“) erklärst du dich mit diesen Bedingungen einverstanden. Wenn du nicht einverstanden bist, nutze den Dienst bitte nicht.'],
+      ['2. Was der Dienst ist', 'CodeStudio Pro ist ein kostenloser Code-Editor, der in deinem Browser läuft. Deine Dateien werden lokal auf deinem Gerät verarbeitet. Der Dienst lädt sie nicht auf einen Server hoch, und sie gehen beim Neuladen der Seite verloren. Exportiere, was du behalten willst (ZIP oder einzelne Datei).'],
+      ['3. Deine Verantwortung', 'Du bist für den Code und die Inhalte verantwortlich, die du schreibst, importierst oder in der Vorschau ausführst. Du darfst den Dienst nicht für rechtswidrige Zwecke nutzen und keine Schadsoftware, Phishing-Seiten oder Inhalte erstellen oder verbreiten, die Rechte anderer verletzen.'],
+      ['4. Sicherheits-Scan', 'Der eingebaute Sicherheits-Scan arbeitet mit Mustersuche. Er findet häufige Fehler, ersetzt aber kein Sicherheits-Audit. Ein sauberes Ergebnis garantiert nicht, dass dein Code sicher ist.'],
+      ['5. Komponenten Dritter', 'Der Dienst lädt die Bibliotheken GSAP und JSZip über das jsDelivr-CDN. Beim Laden wird deine IP-Adresse an den CDN-Anbieter übermittelt. Externe Links (z. B. zu Discord) führen zu Seiten Dritter mit eigenen Bedingungen und Datenschutzhinweisen.'],
+      ['6. Exportierte Dateien', 'ZIP-Exporte enthalten einen Herkunftshinweis („ERSTELLT MIT“ / „Urheberrecht.txt“) mit Verweis auf {site}. Dein Code gehört weiterhin dir.'],
+      ['7. Keine Gewährleistung', 'Der Dienst wird „wie besehen“ und „wie verfügbar“ ohne jegliche Gewährleistung bereitgestellt und kann jederzeit geändert oder eingestellt werden.'],
+      ['8. Haftung', 'Soweit gesetzlich zulässig, haftet der Betreiber nicht für Schäden aus der Nutzung des Dienstes, einschließlich Datenverlust. Unberührt bleibt die Haftung für Vorsatz, grobe Fahrlässigkeit, Verletzung von Leben, Körper oder Gesundheit sowie nach zwingendem Recht.'],
+      ['9. Änderungen', 'Diese Bedingungen können angepasst werden. Es gilt die hier angezeigte Fassung.'],
+      ['10. Kontakt', 'Fragen zu diesen Bedingungen? Schreib an {mail} oder komm auf unseren Discord:\n{discord}']
+    ] },
+    imprint: { title: 'Impressum', meta: 'Angaben gemäß Digitale-Dienste-Gesetz (DDG)', sections: [
+      ['Betreiber', 'marcel533'],
+      ['Kontakt', 'E-Mail: {mail}\n{discord}'],
+      ['Webseite', '{site}'],
+      ['Haftung für Inhalte', 'Die Inhalte dieser Seite wurden mit Sorgfalt erstellt. Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen.'],
+      ['Haftung für Links', 'Diese Seite verlinkt auf externe Seiten Dritter (z. B. Discord). Auf deren Inhalte hat der Betreiber keinen Einfluss und übernimmt dafür keine Verantwortung. Für verlinkte Inhalte ist stets der jeweilige Anbieter verantwortlich.']
+    ] }
+  }
+};
+const legalDlg = $('#legal'), legalBody = $('#legalBody');
+let legalKind = 'tos';
+const DISCORD_PATH = 'M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z';
+function discordButton() {
+  const a = document.createElement('a');
+  a.className = 'discord-btn'; a.href = DISCORD_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS(NS, 'path'); path.setAttribute('d', DISCORD_PATH);
+  svg.append(path);
+  const label = document.createElement('span'); label.textContent = t('legal.discord');
+  a.append(svg, label);
+  a.addEventListener('click', openDiscord);
+  return a;
+}
+/* In Sandbox-Rahmen ohne allow-popups liefert window.open() null. Dann: Top-Navigation, sonst Link zum Kopieren anzeigen. */
+function openDiscord(e) {
+  e.preventDefault();
+  let w = null;
+  try { w = window.open(DISCORD_URL, '_blank'); } catch { /* ignore */ }
+  if (w) { try { w.opener = null; } catch { /* ignore */ } return; }
+  try { window.top.location.href = DISCORD_URL; return; } catch { /* blocked */ }
+  if (!$('#discordFallback')) {
+    const p = document.createElement('p');
+    p.id = 'discordFallback'; p.className = 'legal-meta';
+    p.append(document.createTextNode(t('legal.blocked') + ' '));
+    const code = document.createElement('code'); code.textContent = DISCORD_URL; code.style.userSelect = 'all';
+    p.append(code);
+    e.currentTarget.parentNode.after(p);
+  }
+}
+function richText(parent, text) {
+  text.split(/(\{mail\}|\{discord\}|\{site\})/).forEach(part => {
+    if (!part) return;
+    if (part === '{discord}') { parent.append(discordButton()); return; }
+    const map = {
+      '{mail}': ['mailto:' + CONTACT_MAIL, CONTACT_MAIL],
+      '{site}': [SITE_URL, SITE_URL]
+    };
+    if (map[part]) {
+      const a = document.createElement('a');
+      a.href = map[part][0]; a.textContent = map[part][1];
+      if (part !== '{mail}') { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      parent.append(a);
+    } else parent.append(document.createTextNode(part));
+  });
+}
+function renderLegal() {
+  const d = (LEGAL[lang] || LEGAL.en)[legalKind];
+  $('#legalTitle').textContent = d.title;
+  legalBody.replaceChildren();
+  const meta = document.createElement('p'); meta.className = 'legal-meta'; meta.textContent = d.meta;
+  legalBody.append(meta);
+  for (const [h, text] of d.sections) {
+    const h3 = document.createElement('h3'); h3.textContent = h;
+    legalBody.append(h3);
+    text.split('\n').forEach(line => { const p = document.createElement('p'); richText(p, line); legalBody.append(p); });
+  }
+  legalBody.scrollTop = 0;
+}
+function openLegal(kind) {
+  legalKind = kind === 'imprint' ? 'imprint' : 'tos';
+  renderLegal();
+  if (!legalDlg.open) { legalDlg.showModal(); popIn($('#legalInner')); }
+  $('#legalClose').focus();
+}
+$('#legalClose').addEventListener('click', () => legalDlg.close());
+legalDlg.addEventListener('click', e => { if (e.target === legalDlg) legalDlg.close(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-legal]');
+  if (b) openLegal(b.dataset.legal);
+});
+
+const pal = $('#pal'), palIn = $('#palIn'), palList = $('#palList');
+let palIdx = 0, palItems = [];
+const setLock = () => { el.lockNet.checked = !el.lockNet.checked; el.lockNet.dispatchEvent(new Event('change')); };
+const commands = () => [
+  { label: t('cmd.new'), run: newFile },
+  { label: t('cmd.rename'), run: () => renameFile(current) },
+  { label: t('cmd.delete'), run: () => deleteFile(current) },
+  { label: t('cmd.run'), key: 'Ctrl Enter', run: runPreview },
+  { label: t('cmd.import'), run: () => $('#fileInput').click() },
+  { label: t('cmd.export'), run: exportZip },
+  { label: t('cmd.download'), run: downloadCurrent },
+  { label: t('cmd.console'), run: () => showDock('console') },
+  { label: t('cmd.security'), run: () => showDock('security') },
+  { label: t('cmd.lock'), run: setLock },
+  { label: t('cmd.full'), run: () => setDevice('full') },
+  { label: t('cmd.tablet'), run: () => setDevice('768') },
+  { label: t('cmd.mobile'), run: () => setDevice('390') },
+  { label: t('cmd.lang'), run: () => setLang(lang === 'en' ? 'de' : 'en') },
+  { label: t('legal.tos'), run: () => openLegal('tos') },
+  { label: t('legal.imprint'), run: () => openLegal('imprint') },
+  { label: t('cmd.reset'), run: resetProject }
+];
+function renderPalette() {
+  const q = palIn.value.trim().toLowerCase();
+  palItems = commands().filter(c => c.label.toLowerCase().includes(q));
+  palIdx = clamp(palIdx, 0, Math.max(0, palItems.length - 1));
+  palList.replaceChildren();
+  if (!palItems.length) {
+    const li = document.createElement('li'); li.className = 'none'; li.textContent = t('pal.none'); palList.append(li); return;
+  }
+  palItems.forEach((c, i) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option'); li.setAttribute('aria-selected', String(i === palIdx));
+    const a = document.createElement('span'); a.textContent = c.label;
+    const b = document.createElement('span'); b.textContent = c.key || '';
+    li.append(a, b);
+    li.addEventListener('click', () => runCmd(c));
+    li.addEventListener('mousemove', () => { if (palIdx !== i) { palIdx = i; $$('li', palList).forEach((x, j) => x.setAttribute('aria-selected', String(j === i))); } });
+    palList.append(li);
+  });
+}
+function runCmd(c) { pal.close(); setTimeout(c.run, 0); }
+function openPalette() {
+  if (pal.open) return;
+  palIn.value = ''; palIdx = 0; renderPalette();
+  pal.showModal(); popIn([palIn, palList]); palIn.focus();
+}
+palIn.addEventListener('input', () => { palIdx = 0; renderPalette(); });
+palIn.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); palIdx = Math.min(palItems.length - 1, palIdx + 1); renderPalette(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); palIdx = Math.max(0, palIdx - 1); renderPalette(); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (palItems[palIdx]) runCmd(palItems[palIdx]); }
+});
+pal.addEventListener('click', e => { if (e.target === pal) pal.close(); });
+$('#paletteBtn').addEventListener('click', openPalette);
+
+document.addEventListener('keydown', e => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); }
+  else if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); downloadCurrent(); }
+  else if (mod && e.key === 'Enter') { e.preventDefault(); runPreview(); }
+  else if (e.key === 'F2' && document.activeElement === el.ed) { e.preventDefault(); renameFile(current); }
+});
+
+/* ---------- Persistence ---------- */
+let saveTimer;
+function setSave(state) {
+  saveState = state;
+  $('#stSave').textContent = t('st.temp');
+}
+/* Bewusst kein Speichern: Beim Neuladen startet immer das leere Standardprojekt. */
+function persist() {}
+/* ---------- Language ---------- */
+function applyI18n() {
+  $$('[data-i18n]').forEach(n => { n.textContent = t(n.dataset.i18n); });
+  $$('[data-i18n-label]').forEach(n => { const s = t(n.dataset.i18nLabel); n.title = s; n.setAttribute('aria-label', s); });
+  $$('[data-i18n-title]').forEach(n => { n.title = t(n.dataset.i18nTitle); });
+  $$('[data-i18n-ph]').forEach(n => { n.placeholder = t(n.dataset.i18nPh); });
+  $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  document.documentElement.lang = lang;
+}
+function setLang(l) {
+  lang = l; lsSet(LANG_KEY, l);
+  applyI18n(); renderFileList(); renderSecurity(); updateStatus(); setSave(saveState);
+  if (pal.open) renderPalette();
+  if (legalDlg.open) renderLegal();
+  if (!$('#cap-err').hidden) { /* text updates through data-i18n */ }
+  const empty = $('[data-empty]', el.dockCon);
+  if (empty) empty.textContent = t('con.empty');
+}
+$$('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+/* ---------- Bot check ---------- */
+let capAnswer = 0;
+const rnd = max => crypto.getRandomValues(new Uint32Array(1))[0] % max;
+function initCaptcha() {
+  const a = rnd(11) + 2, b = rnd(9) + 2, op = rnd(3);
+  if (op === 0) { capAnswer = a + b; $('#cap-q').textContent = `${a} + ${b} = ?`; }
+  else if (op === 1) { const hi = Math.max(a, b), lo = Math.min(a, b); capAnswer = hi - lo; $('#cap-q').textContent = `${hi} \u2212 ${lo} = ?`; }
+  else { const x = (a % 9) + 2; capAnswer = x * b; $('#cap-q').textContent = `${x} \u00d7 ${b} = ?`; }
+  $('#cap-in').value = '';
+}
+const FAIL_KEY = 'codestudio.fails';
+const LOCK_KEY = 'codestudio.locked';
+const MAX_FAILS = 5;       // 5. Fehlversuch = Rauswurf
+const RED_AT = 4;          // 4. Fehlversuch = Fenster wird rot
+let fails = Number(ssGet(FAIL_KEY)) || 0;
+function kickOut() {
+  ssSet(LOCK_KEY, '1');
+  try { window.location.replace('about:blank'); } catch { /* ignore */ }
+}
+function markCaptcha() {
+  const red = fails >= RED_AT;
+  $('.captcha-card').classList.toggle('alert', red);
+  const err = $('#cap-err');
+  err.dataset.i18n = red ? 'cap.last' : 'cap.wrong';
+  err.textContent = t(err.dataset.i18n);
+}
+function verifyCaptcha() {
+  const raw = $('#cap-in').value;
+  if (raw === '') { $('#cap-in').focus(); return; }
+  if (Number(raw) === capAnswer) {
+    fails = 0; ssSet(FAIL_KEY, '0');
+    ssSet(HUMAN_KEY, '1');
+    const done = () => { el.captcha.hidden = true; el.shell.inert = false; intro(); };
+    if (motionOK()) gsap.to(el.captcha, { autoAlpha: 0, duration: 0.25, onComplete: done }); else done();
+    return;
+  }
+  fails++;
+  ssSet(FAIL_KEY, String(fails));
+  if (fails >= MAX_FAILS) { kickOut(); return; }
+  markCaptcha();
+  $('#cap-err').hidden = false;
+  initCaptcha();
+  $('#cap-in').focus();
+  if (motionOK()) {
+    gsap.to('.captcha-card', { keyframes: [{ x: -8, duration: 0.06 }, { x: 8, duration: 0.06 }, { x: -5, duration: 0.06 }, { x: 5, duration: 0.06 }, { x: 0, duration: 0.06 }] });
+  }
+}
+$('#cap-ok').addEventListener('click', verifyCaptcha);
+$('#cap-in').addEventListener('keydown', e => { if (e.key === 'Enter') verifyCaptcha(); });
+
+/* ---------- Intro (one orchestrated sequence) ---------- */
+function intro() {
+  if (!motionOK()) return;
+  gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.42, clearProps: 'transform,opacity,visibility' } })
+    .from('#topbar', { y: -14, autoAlpha: 0 })
+    .from('#sidebar', { x: -14, autoAlpha: 0 }, '<0.08')
+    .from('.editor-pane, .preview-pane', { y: 10, autoAlpha: 0, stagger: 0.08 }, '<0.08')
+    .from('#dock, .status', { autoAlpha: 0 }, '<0.1');
+}
+
+/* ---------- Boot ---------- */
+function boot() {
+  if (ssGet(LOCK_KEY) === '1') { kickOut(); return; }
+  const saved = lsGet(LANG_KEY);
+  lang = saved === 'de' || saved === 'en' ? saved : (navigator.language || '').toLowerCase().startsWith('de') ? 'de' : 'en';
+  applyI18n();
+  try { localStorage.removeItem(STORE_KEY); } catch { /* ignore */ }
+  files = starter(); current = 'index.html'; setSplit(50);
+  if (window.matchMedia('(max-width: 860px)').matches) dockH = 170;
+  el.dock.style.height = dockH + 'px';
+  el.ed.value = files.get(current);
+  renderHL(); renderGutter(true); renderFileList(); updateBar(); updateStatus();
+  conEmpty();
+  showDock('console');
+  findings = scanAll(); renderSecurity(); renderGutter(true);
+  runPreview();
+  setSave('saved');
+
+  if (ssGet(HUMAN_KEY) === '1') { el.captcha.hidden = true; el.shell.inert = false; intro(); }
+  else { el.captcha.hidden = false; initCaptcha(); if (fails > 0) { markCaptcha(); $('#cap-err').hidden = false; } $('#cap-in').focus(); }
+}
+boot();
+})();
+</script>
 </body>
 </html>
