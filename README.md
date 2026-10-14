@@ -1,4 +1,4 @@
-# ⚙️ MARCEL Online Code Editor
+# ⚙️ MARCEL533 Online Code Editor
 
 **DE:** Minimalistischer, browserbasierter Code-Editor für HTML, CSS & JavaScript. Live-Vorschau in Echtzeit – ohne Installation, Account oder Konfiguration. Ideal für Tests, Demos und schnelles Prototyping.
 
@@ -14,6 +14,6 @@
 
 ---
 
-🔗 **Try now / Jetzt testen:** [MARCEL Code Editor](https://marcel533.github.io/online-code-editor/)
+🔗 **Try now / Jetzt testen:** [MARCEL533 Code Editor](https://marcel533.github.io/online-code-editor/)
 
 *Note: This project and README were fully generated with AI.*
