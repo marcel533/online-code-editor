@@ -463,7 +463,6 @@ dialog.legal { width: min(660px, calc(100vw - 32px)); padding: 0; }
 
 /* ---------- Constants ---------- */
 const SITE_URL = 'https://marcel533.github.io/online-code-editor/';
-const CONTACT_MAIL = 'marcel.worgotter@proton.me';
 const DISCORD_URL = 'https://discord.gg/5RqSyuZbDq';
 const STORE_KEY = 'codestudio.pro.v2';
 const LANG_KEY = 'codestudio.lang';
@@ -1324,11 +1323,11 @@ const LEGAL = {
       ['7. No warranty', 'The Service is provided "as is" and "as available", without warranty of any kind, and may change or be discontinued at any time.'],
       ['8. Liability', 'To the extent permitted by law, the operator is not liable for damages arising from the use of the Service, including data loss. This does not limit liability for intent, gross negligence, or injury to life, body or health, or liability under mandatory law.'],
       ['9. Changes', 'These terms may be updated. The version shown here applies.'],
-      ['10. Contact', 'Questions about these terms? Write to {mail} or join us on Discord:\n{discord}']
+      ['10. Contact', 'Questions about these terms? Join us on Discord:\n{discord}']
     ] },
     imprint: { title: 'Legal Notice (Impressum)', meta: 'Information pursuant to the German Digital Services Act (DDG)', sections: [
       ['Operator', 'marcel533'],
-      ['Contact', 'Email: {mail}\n{discord}'],
+      ['Contact', '{discord}'],
       ['Website', '{site}'],
       ['Liability for content', 'The contents of this site were created with care. No guarantee is given for correctness, completeness or timeliness.'],
       ['Liability for links', 'This site links to external third-party sites (for example Discord). The operator has no influence on their content and is not responsible for it. The respective provider is responsible for linked content.']
@@ -1345,11 +1344,11 @@ const LEGAL = {
       ['7. Keine Gewährleistung', 'Der Dienst wird „wie besehen“ und „wie verfügbar“ ohne jegliche Gewährleistung bereitgestellt und kann jederzeit geändert oder eingestellt werden.'],
       ['8. Haftung', 'Soweit gesetzlich zulässig, haftet der Betreiber nicht für Schäden aus der Nutzung des Dienstes, einschließlich Datenverlust. Unberührt bleibt die Haftung für Vorsatz, grobe Fahrlässigkeit, Verletzung von Leben, Körper oder Gesundheit sowie nach zwingendem Recht.'],
       ['9. Änderungen', 'Diese Bedingungen können angepasst werden. Es gilt die hier angezeigte Fassung.'],
-      ['10. Kontakt', 'Fragen zu diesen Bedingungen? Schreib an {mail} oder komm auf unseren Discord:\n{discord}']
+      ['10. Kontakt', 'Fragen zu diesen Bedingungen? Komm auf unseren Discord:\n{discord}']
     ] },
     imprint: { title: 'Impressum', meta: 'Angaben gemäß Digitale-Dienste-Gesetz (DDG)', sections: [
       ['Betreiber', 'marcel533'],
-      ['Kontakt', 'E-Mail: {mail}\n{discord}'],
+      ['Kontakt', '{discord}'],
       ['Webseite', '{site}'],
       ['Haftung für Inhalte', 'Die Inhalte dieser Seite wurden mit Sorgfalt erstellt. Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen.'],
       ['Haftung für Links', 'Diese Seite verlinkt auf externe Seiten Dritter (z. B. Discord). Auf deren Inhalte hat der Betreiber keinen Einfluss und übernimmt dafür keine Verantwortung. Für verlinkte Inhalte ist stets der jeweilige Anbieter verantwortlich.']
@@ -1393,13 +1392,12 @@ function richText(parent, text) {
     if (!part) return;
     if (part === '{discord}') { parent.append(discordButton()); return; }
     const map = {
-      '{mail}': ['mailto:' + CONTACT_MAIL, CONTACT_MAIL],
       '{site}': [SITE_URL, SITE_URL]
     };
     if (map[part]) {
       const a = document.createElement('a');
       a.href = map[part][0]; a.textContent = map[part][1];
-      if (part !== '{mail}') { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
       parent.append(a);
     } else parent.append(document.createTextNode(part));
   });
