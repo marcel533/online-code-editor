@@ -1,9 +1,9 @@
 # ⚙️ MARCEL533 Online Code Editor
 
-**DE:** Minimalistischer, browserbasierter Code-Editor für HTML, CSS & JavaScript. Live-Vorschau in Echtzeit – ohne Installation, Account oder Konfiguration. Ideal für Tests, Demos und schnelles Prototyping.
+**DE:**  browserbasierter Code-Editor für HTML, CSS & JavaScript. Mit Live-Vorschau in Echtzeit – ohne Account 
 
-**EN:** Minimalist browser-based code editor for HTML, CSS & JavaScript. Instant live preview — no setup, accounts, or dependencies. Built for rapid testing, demos, and prototyping.
-
+**EN:** browser-based code editor for HTML, CSS & JavaScript. Instant live preview no accounts
+needed
 ---
 
 ### Features / Funktion
